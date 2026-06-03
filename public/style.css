@@ -1,0 +1,574 @@
+/* ============================================
+   SUSPENTRACK - ESTILOS GLOBALES
+   Sistema de Gestión de Mantenimiento de Suspensión
+   Cantón Mocha - Tungurahua
+   ============================================ */
+
+:root {
+    /* Colores principales */
+    --azul-principal: #1a3a8a;
+    --azul-oscuro: #0d1b3e;
+    --azul-claro: #2563eb;
+    --dorado: #c5a059;
+    --dorado-brillante: #f1d279;
+    --dorado-oscuro: #a07e3a;
+
+    /* Colores de criticidad */
+    --rojo-critico: #dc3545;
+    --naranja-alto: #fd7e14;
+    --amarillo-medio: #ffc107;
+    --verde-bajo: #198754;
+
+    /* Colores generales */
+    --blanco: #ffffff;
+    --gris-fondo: #f4f6f9;
+    --gris-claro: #e9ecef;
+    --gris-medio: #6c757d;
+    --gris-oscuro: #343a40;
+    --negro: #212529;
+
+    /* Sombras */
+    --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --sombra-media: 0 5px 20px rgba(0, 0, 0, 0.08);
+    --sombra-fuerte: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   ESTILOS BASE
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--gris-fondo);
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--negro);
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* ============================================
+   NAVBAR
+   ============================================ */
+
+.navbar {
+    background: linear-gradient(135deg, var(--azul-principal) 0%, var(--azul-oscuro) 100%);
+    border-bottom: 3px solid var(--dorado);
+    box-shadow: var(--sombra-media);
+    padding: 0.75rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--dorado-brillante) !important;
+    font-size: 1.25rem;
+}
+
+.navbar-brand i {
+    color: var(--dorado);
+    font-size: 1.5rem;
+}
+
+.navbar-brand:hover {
+    color: var(--dorado) !important;
+}
+
+.nav-link {
+    color: var(--blanco) !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 0 2px;
+    border-radius: 8px;
+}
+
+.nav-link:hover {
+    color: var(--dorado-brillante) !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+    background: var(--dorado);
+    color: var(--negro) !important;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.sidebar {
+    background: linear-gradient(180deg, var(--azul-principal) 0%, var(--azul-oscuro) 100%);
+    min-height: 100vh;
+    box-shadow: var(--sombra-fuerte);
+}
+
+.sidebar a {
+    color: var(--blanco);
+    text-decoration: none;
+    display: block;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    margin: 4px 12px;
+    font-size: 0.9rem;
+}
+
+.sidebar a i {
+    margin-right: 10px;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar a:hover {
+    background: var(--dorado);
+    color: var(--negro);
+    transform: translateX(5px);
+}
+
+.sidebar a.active {
+    background: var(--dorado);
+    color: var(--negro);
+}
+
+/* ============================================
+   TARJETAS (CARDS)
+   ============================================ */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--sombra-suave);
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-media);
+}
+
+.card-header {
+    background-color: var(--blanco);
+    border-bottom: 1px solid var(--gris-claro);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-oscuro)) !important;
+    color: var(--blanco);
+}
+
+.card-header.bg-dark {
+    background: var(--azul-oscuro) !important;
+    color: var(--blanco);
+}
+
+/* ============================================
+   TARJETAS DE ESTADÍSTICAS (KPIs)
+   ============================================ */
+
+.card-dashboard {
+    border: none;
+    border-radius: 15px;
+    box-shadow: var(--sombra-media);
+    transition: all 0.3s ease;
+}
+
+.card-dashboard:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sombra-fuerte);
+}
+
+.kpi-card {
+    border-left: 4px solid;
+}
+
+.kpi-card.primary { border-left-color: var(--azul-principal); }
+.kpi-card.success { border-left-color: var(--verde-bajo); }
+.kpi-card.danger { border-left-color: var(--rojo-critico); }
+.kpi-card.warning { border-left-color: var(--amarillo-medio); }
+.kpi-card.info { border-left-color: var(--azul-claro); }
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--negro);
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-oscuro));
+    border: none;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--dorado), var(--dorado-oscuro));
+    color: var(--negro);
+    transform: translateY(-2px);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--dorado-brillante), var(--dorado));
+    color: var(--negro);
+    border: none;
+    font-weight: 600;
+    padding: 10px 24px;
+    transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-oscuro));
+    color: var(--blanco);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    border-color: var(--azul-principal);
+    color: var(--azul-principal);
+}
+
+.btn-outline-primary:hover {
+    background: var(--azul-principal);
+    border-color: var(--azul-principal);
+}
+
+/* ============================================
+   TABLAS
+   ============================================ */
+
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: var(--azul-principal);
+    color: var(--blanco);
+}
+
+.table thead th {
+    font-weight: 600;
+    padding: 12px 16px;
+    border: none;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(26, 58, 138, 0.05);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(26, 58, 138, 0.08);
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+
+.form-control, .form-select {
+    border: 1px solid var(--gris-claro);
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2);
+    outline: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--azul-oscuro);
+    margin-bottom: 6px;
+}
+
+.form-label.required:after {
+    content: " *";
+    color: var(--rojo-critico);
+}
+
+/* ============================================
+   BADGES (INSIGNIAS)
+   ============================================ */
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+/* Badges de criticidad */
+.badge-critico {
+    background-color: var(--rojo-critico);
+    color: var(--blanco);
+    animation: pulse 1.5s infinite;
+}
+
+.badge-alto {
+    background-color: var(--naranja-alto);
+    color: var(--blanco);
+}
+
+.badge-medio {
+    background-color: var(--amarillo-medio);
+    color: var(--negro);
+}
+
+.badge-bajo {
+    background-color: var(--verde-bajo);
+    color: var(--blanco);
+}
+
+/* Badges de estado de componentes */
+.badge-excelente { background-color: #198754; color: white; }
+.badge-bueno { background-color: #0dcaf0; color: #000; }
+.badge-regular { background-color: #ffc107; color: #000; }
+.badge-malo { background-color: #fd7e14; color: white; }
+.badge-critico { background-color: #dc3545; color: white; }
+
+/* Badges de estado de vehículos */
+.badge-operativo { background-color: #198754; color: white; }
+.badge-mantenimiento { background-color: #ffc107; color: #000; }
+.badge-inoperativo { background-color: #dc3545; color: white; }
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+/* ============================================
+   COMPONENTES ESPECÍFICOS DE SUSPENTRACK
+   ============================================ */
+
+/* Tarjetas de componentes de suspensión */
+.componente-card {
+    border: 1px solid var(--gris-claro);
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    background: var(--blanco);
+    cursor: pointer;
+}
+
+.componente-card:hover {
+    border-color: var(--dorado);
+    box-shadow: var(--sombra-media);
+    transform: translateY(-2px);
+}
+
+.componente-estado-excelente { border-left: 4px solid #198754; }
+.componente-estado-bueno { border-left: 4px solid #0dcaf0; }
+.componente-estado-regular { border-left: 4px solid #ffc107; }
+.componente-estado-malo { border-left: 4px solid #fd7e14; }
+.componente-estado-critico { border-left: 4px solid #dc3545; }
+
+/* Ficha de vehículo */
+.ficha-vehiculo {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--dorado);
+}
+
+/* Alertas */
+.alerta-item {
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.alerta-item:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.alerta-critico { border-left: 4px solid var(--rojo-critico); }
+.alerta-alto { border-left: 4px solid var(--naranja-alto); }
+.alerta-medio { border-left: 4px solid var(--amarillo-medio); }
+.alerta-bajo { border-left: 4px solid var(--verde-bajo); }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    background-color: var(--azul-oscuro);
+    color: var(--gris-medio);
+    padding: 30px 0;
+    margin-top: 50px;
+    border-top: 4px solid var(--dorado);
+}
+
+footer a {
+    color: var(--gris-medio);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--dorado-brillante);
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.text-gold {
+    color: var(--dorado);
+}
+
+.bg-gold {
+    background-color: var(--dorado);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--azul-principal), var(--azul-oscuro));
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition {
+    transition: all 0.3s ease;
+}
+
+.shadow-hover:hover {
+    box-shadow: var(--sombra-media);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sidebar {
+        min-height: auto;
+        margin-bottom: 20px;
+    }
+
+    .stats-number {
+        font-size: 1.5rem;
+    }
+
+    .card-icon {
+        font-size: 2rem;
+    }
+
+    .navbar-brand span {
+        font-size: 0.9rem;
+    }
+
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    .stats-number {
+        font-size: 1.25rem;
+    }
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADA
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gris-claro);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--azul-principal);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dorado);
+}
+
+/* ============================================
+   IMPRESIÓN
+   ============================================ */
+
+@media print {
+    .navbar, .sidebar, footer, .btn, .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+        padding: 20px;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}

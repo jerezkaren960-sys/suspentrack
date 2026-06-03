@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Alertas de Mantenimiento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .alert-card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .alert-card:hover {
+            transform: translateY(-5px);
+        }
+        .critico {
+            background: linear-gradient(135deg, #dc3545, #b02a37);
+            color: white;
+        }
+        .alto {
+            background: linear-gradient(135deg, #fd7e14, #e36209);
+            color: white;
+        }
+        .medio {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #000;
+        }
+        .bajo {
+            background: linear-gradient(135deg, #198754, #157347);
+            color: white;
+        }
+        .alert-stats {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .table-alertas tr {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .table-alertas tr:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .badge-nivel {
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 50px;
+        }
+        .filtro-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+            <i class="fas fa-truck me-2"></i>
+            <span>SuspenTrack - Mocha</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
+                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
+                <li class="nav-item"><a class="nav-link active" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
+                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-bell text-warning me-2"></i>
+            Alertas de Mantenimiento
+        </h2>
+        <button class="btn btn-outline-secondary" onclick="recargarAlertas()">
+            <i class="fas fa-sync-alt me-2"></i> Actualizar
+        </button>
+    </div>
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center critico">
+                <div class="card-body">
+                    <i class="fas fa-skull-crosswalk fa-2x mb-2"></i>
+                    <h6 class="text-white-50">CRÍTICAS</h6>
+                    <span class="alert-stats" id="totalCriticas">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center alto">
+                <div class="card-body">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h6 class="text-white-50">ALTA</h6>
+                    <span class="alert-stats" id="totalAltas">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center medio">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h6 class="text-dark-50">MEDIA</h6>
+                    <span class="alert-stats" id="totalMedias">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bajo">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h6 class="text-white-50">BAJA</h6>
+                    <span class="alert-stats" id="totalBajas">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtro-bar">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Filtrar por nivel</label>
+                <select id="filtroNivel" class="form-select" onchange="aplicarFiltros()">
+                    <option value="TODOS">Todos los niveles</option>
+                    <option value="CRITICO">Crítico</option>
+                    <option value="ALTO">Alto</option>
+                    <option value="MEDIO">Medio</option>
+                    <option value="BAJO">Bajo</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Buscar por placa</label>
+                <input type="text" id="buscarPlaca" class="form-control" placeholder="Ej: ABC-123" onkeyup="aplicarFiltros()">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button class="btn btn-secondary w-100" onclick="limpiarFiltros()">
+                    <i class="fas fa-eraser me-2"></i> Limpiar filtros
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de alertas -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th><i class="fas fa-hashtag"></i> ID</th>
+                        <th><i class="fas fa-truck"></i> Vehículo</th>
+                        <th><i class="fas fa-chart-line"></i> Nivel</th>
+                        <th><i class="fas fa-envelope"></i> Mensaje</th>
+                        <th><i class="fas fa-calendar"></i> Fecha</th>
+                        <th><i class="fas fa-cogs"></i> Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tablaAlertas" class="table-alertas">
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando alertas...</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalle de alerta -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" id="modalHeader">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bell me-2"></i> Detalle de Alerta
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Contenido dinámico -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnGenerarMantenimiento" onclick="generarMantenimientoDesdeAlerta()">
+                        <i class="fas fa-tools me-2"></i> Generar Mantenimiento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const token = localStorage.getItem('token');
+    let alertasData = [];
+    let alertaSeleccionada = null;
+
+    // Verificar autenticación
+    if (!token) {
+        window.location.href = 'index.html';
+    }
+
+    // Cargar alertas desde el backend
+    async function cargarAlertas() {
+        try {
+            const response = await fetch('/api/alerts', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar alertas');
+            }
+
+            alertasData = await response.json();
+            actualizarEstadisticas();
+            aplicarFiltros();
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('tablaAlertas').innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger py-4">
+                        <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                        <p>Error al cargar alertas. Verifique la conexión con el servidor.</p>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Actualizar tarjetas de estadísticas
+    function actualizarEstadisticas() {
+        const criticas = alertasData.filter(a => a.nivel === 'CRITICO').length;
+        const altas = alertasData.filter(a => a.nivel === 'ALTO').length;
+        const medias = alertasData.filter(a => a.nivel === 'MEDIO').length;
+        const bajas = alertasData.filter(a => a.nivel === 'BAJO').length;
+
+        document.getElementById('totalCriticas').textContent = criticas;
+        document.getElementById('totalAltas').textContent = altas;
+        document.getElementById('totalMedias').textContent = medias;
+        document.getElementById('totalBajas').textContent = bajas;
+    }
+
+    // Aplicar filtros a la tabla
+    function aplicarFiltros() {
+        const filtroNivel = document.getElementById('filtroNivel').value;
+        const busqueda = document.getElementById('buscarPlaca').value.toLowerCase();
+
+        let filtradas = alertasData;
+
+        if (filtroNivel !== 'TODOS') {
+            filtradas = filtradas.filter(a => a.nivel === filtroNivel);
+        }
+
+        if (busqueda) {
+            filtradas = filtradas.filter(a => a.placa && a.placa.toLowerCase().includes(busqueda));
+        }
+
+        mostrarTabla(filtradas);
+    }
+
+    // Mostrar tabla de alertas
+    function mostrarTabla(alertas) {
+        const tbody = document.getElementById('tablaAlertas');
+
+        if (alertas.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+                        <p class="mb-0">No hay alertas activas</p>
+                        <small class="text-muted">Todos los vehículos están dentro de parámetros normales</small>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = alertas.map(alerta => `
+            <tr onclick="verDetalle(${alerta.id})" style="cursor: pointer;">
+                <td>${alerta.id}</td>
+                <td>
+                    <strong>${alerta.placa || 'N/A'}</strong>
+                    ${alerta.marca ? `<br><small class="text-muted">${alerta.marca} ${alerta.modelo || ''}</small>` : ''}
+                </td>
+                <td>
+                    <span class="badge-nivel ${getNivelColor(alerta.nivel)}">
+                        <i class="fas ${getNivelIcono(alerta.nivel)} me-1"></i>
+                        ${alerta.nivel}
+                    </span>
+                </td>
+                <td>${alerta.mensaje || 'Sin mensaje'}</td>
+                <td><small>${formatearFecha(alerta.fecha)}</small></td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); eliminarAlerta(${alerta.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function getNivelColor(nivel) {
+        const colores = {
+            'CRITICO': 'critico',
+            'ALTO': 'alto',
+            'MEDIO': 'medio',
+            'BAJO': 'bajo'
+        };
+        return colores[nivel] || 'secondary';
+    }
+
+    function getNivelIcono(nivel) {
+        const iconos = {
+            'CRITICO': 'fa-skull-crosswalk',
+            'ALTO': 'fa-exclamation-triangle',
+            'MEDIO': 'fa-clock',
+            'BAJO': 'fa-check-circle'
+        };
+        return iconos[nivel] || 'fa-bell';
+    }
+
+    function formatearFecha(fecha) {
+        if (!fecha) return 'Fecha desconocida';
+        const date = new Date(fecha);
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Ver detalle de alerta
+    async function verDetalle(id) {
+        alertaSeleccionada = alertasData.find(a => a.id === id);
+        if (!alertaSeleccionada) return;
+
+        const modalHeader = document.getElementById('modalHeader');
+        const modalBody = document.getElementById('modalBody');
+
+        modalHeader.className = `modal-header ${getNivelColor(alertaSeleccionada.nivel)}`;
+
+        modalBody.innerHTML = `
+            <div class="mb-3">
+                <label class="fw-bold">Vehículo:</label>
+                <p>${alertaSeleccionada.placa || 'N/A'} - ${alertaSeleccionada.marca || ''} ${alertaSeleccionada.modelo || ''}</p>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold">Nivel de Criticidad:</label>
+                <p><span class="badge-nivel ${getNivelColor(alertaSeleccionada.nivel)}">${alertaSeleccionada.nivel}</span></p>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold">Mensaje:</label>
+                <p class="p-2 bg-light rounded">${alertaSeleccionada.mensaje || 'Sin mensaje'}</p>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold">Fecha de generación:</label>
+                <p>${formatearFecha(alertaSeleccionada.fecha)}</p>
+            </div>
+            <hr>
+            <div class="alert alert-warning">
+                <i class="fas fa-lightbulb me-2"></i>
+                <strong>Recomendación:</strong> ${alertaSeleccionada.nivel === 'CRITICO' ?
+            'Se recomienda realizar mantenimiento correctivo de inmediato.' :
+            alertaSeleccionada.nivel === 'ALTO' ?
+                'Programar mantenimiento preventivo en los próximos días.' :
+                'Monitorear el estado del vehículo.'}
+            </div>
+        `;
+
+        const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+        modal.show();
+    }
+
+    // Generar mantenimiento desde alerta
+    function generarMantenimientoDesdeAlerta() {
+        if (alertaSeleccionada) {
+            window.location.href = `mantenimiento.html?vehiculo_id=${alertaSeleccionada.vehiculo_id}&alerta_id=${alertaSeleccionada.id}`;
+        }
+    }
+
+    // Eliminar alerta
+    async function eliminarAlerta(id) {
+        if (confirm('¿Está seguro de eliminar esta alerta?')) {
+            try {
+                const response = await fetch(`/api/alerts/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert('✅ Alerta eliminada correctamente');
+                    cargarAlertas();
+                } else {
+                    alert('❌ Error al eliminar alerta');
+                }
+            } catch (error) {
+                alert('❌ Error de conexión');
+            }
+        }
+    }
+
+    // Recargar alertas
+    function recargarAlertas() {
+        cargarAlertas();
+    }
+
+    // Limpiar filtros
+    function limpiarFiltros() {
+        document.getElementById('filtroNivel').value = 'TODOS';
+        document.getElementById('buscarPlaca').value = '';
+        aplicarFiltros();
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+        if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Auto-refresh cada 30 segundos
+    setInterval(() => {
+        cargarAlertas();
+    }, 30000);
+
+    // Cargar datos al iniciar
+    cargarAlertas();
+</script>
+
+</body>
+</html>

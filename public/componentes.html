@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Componentes de Suspensión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .componente-card {
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .componente-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .estado-excelente { border-left: 5px solid #198754; background: #f8fff9; }
+        .estado-bueno { border-left: 5px solid #0dcaf0; background: #f0f9ff; }
+        .estado-regular { border-left: 5px solid #ffc107; background: #fffbf0; }
+        .estado-malo { border-left: 5px solid #fd7e14; background: #fff5f0; }
+        .estado-critico { border-left: 5px solid #dc3545; background: #fff5f5; animation: pulse-bg 2s infinite; }
+
+        @keyframes pulse-bg {
+            0%, 100% { background-color: #fff5f5; }
+            50% { background-color: #ffe0e0; }
+        }
+
+        .badge-estado {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 50px;
+        }
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .form-header {
+            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
+            color: white;
+            padding: 20px;
+        }
+        .estado-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .estado-option {
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .estado-option:hover { transform: scale(1.05); }
+        .estado-option.selected { border-color: #333; box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+            <i class="fas fa-truck me-2"></i>
+            <span>SuspenTrack - Mocha</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
+                <li class="nav-item"><a class="nav-link active" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
+                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
+                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h2>
+            <i class="fas fa-cogs text-primary me-2"></i>
+            Componentes de Suspensión
+        </h2>
+        <div>
+            <button class="btn btn-outline-primary me-2" onclick="recargarComponentes()">
+                <i class="fas fa-sync-alt me-2"></i> Actualizar
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalComponente" onclick="abrirModalNuevo()">
+                <i class="fas fa-plus me-2"></i> Registrar Componente
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Buscar por placa</label>
+                    <input type="text" id="buscarPlaca" class="form-control" placeholder="Ej: ABC-123" onkeyup="aplicarFiltros()">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Filtrar por estado</label>
+                    <select id="filtroEstado" class="form-select" onchange="aplicarFiltros()">
+                        <option value="TODOS">Todos los estados</option>
+                        <option value="EXCELENTE">Excelente</option>
+                        <option value="BUENO">Bueno</option>
+                        <option value="REGULAR">Regular</option>
+                        <option value="MALO">Malo</option>
+                        <option value="CRITICO">Crítico</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Filtrar por componente</label>
+                    <select id="filtroComponente" class="form-select" onchange="aplicarFiltros()">
+                        <option value="TODOS">Todos los componentes</option>
+                        <option value="AMORTIGUADOR">Amortiguador</option>
+                        <option value="RESORTE">Resorte</option>
+                        <option value="ROTULA">Rótula</option>
+                        <option value="BUJE">Buje</option>
+                        <option value="BRAZO_SUSPENSION">Brazo de Suspensión</option>
+                        <option value="BARRA_ESTABILIZADORA">Barra Estabilizadora</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid de componentes -->
+    <div class="row" id="gridComponentes">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2 text-muted">Cargando componentes...</p>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA REGISTRAR/EDITAR COMPONENTE -->
+<div class="modal fade" id="modalComponente" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header form-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-cogs me-2"></i>
+                    <span id="modalTitulo">Registrar Componente</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="formComponente">
+                    <input type="hidden" id="componente_id">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label required">Vehículo</label>
+                            <select id="vehiculo_id" class="form-select" required>
+                                <option value="">Seleccionar vehículo...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label required">Componente</label>
+                            <select id="nombre" class="form-select" required>
+                                <option value="">Seleccionar componente...</option>
+                                <option value="AMORTIGUADOR">🔧 Amortiguador</option>
+                                <option value="RESORTE">🌀 Resorte</option>
+                                <option value="ROTULA">⚙️ Rótula</option>
+                                <option value="BUJE">🔄 Buje</option>
+                                <option value="BRAZO_SUSPENSION">🦾 Brazo de Suspensión</option>
+                                <option value="BARRA_ESTABILIZADORA">📏 Barra Estabilizadora</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label required">Estado del Componente</label>
+                        <div class="estado-selector" id="estadoSelector">
+                            <div class="estado-option bg-success text-white" data-estado="EXCELENTE">✨ Excelente</div>
+                            <div class="estado-option bg-info text-dark" data-estado="BUENO">👍 Bueno</div>
+                            <div class="estado-option bg-warning text-dark" data-estado="REGULAR">⚠️ Regular</div>
+                            <div class="estado-option bg-orange text-white" data-estado="MALO">🔧 Malo</div>
+                            <div class="estado-option bg-danger text-white" data-estado="CRITICO">🚨 Crítico</div>
+                        </div>
+                        <input type="hidden" id="estado" value="BUENO">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observaciones</label>
+                        <textarea id="observaciones" class="form-control" rows="3" placeholder="Describa el estado actual, desgaste observado, recomendaciones..."></textarea>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-chart-line me-2"></i>
+                        <strong>Impacto en criticidad:</strong> El estado de este componente afectará directamente la clasificación de criticidad del vehículo.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarComponente()">
+                    <i class="fas fa-save me-2"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const token = localStorage.getItem('token');
+    let componentesData = [];
+    let vehiculosData = [];
+
+    // Verificar autenticación
+    if (!token) {
+        window.location.href = 'index.html';
+    }
+
+    // Obtener color del estado
+    function getEstadoColor(estado) {
+        const colores = {
+            'EXCELENTE': 'success',
+            'BUENO': 'info',
+            'REGULAR': 'warning',
+            'MALO': 'orange',
+            'CRITICO': 'danger'
+        };
+        return colores[estado] || 'secondary';
+    }
+
+    // Obtener icono del componente
+    function getComponenteIcono(nombre) {
+        const iconos = {
+            'AMORTIGUADOR': 'fa-shock-absorber',
+            'RESORTE': 'fa-spring',
+            'ROTULA': 'fa-cogs',
+            'BUJE': 'fa-circle',
+            'BRAZO_SUSPENSION': 'fa-hand-peace',
+            'BARRA_ESTABILIZADORA': 'fa-chart-line'
+        };
+        return iconos[nombre] || 'fa-cog';
+    }
+
+    // Formatear fecha
+    function formatearFecha(fecha) {
+        if (!fecha) return 'No registrada';
+        const date = new Date(fecha);
+        return date.toLocaleDateString('es-ES');
+    }
+
+    // Cargar vehículos para el select
+    async function cargarVehiculos() {
+        try {
+            const response = await fetch('/api/vehicles', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            vehiculosData = await response.json();
+
+            const select = document.getElementById('vehiculo_id');
+            select.innerHTML = '<option value="">Seleccionar vehículo...</option>' +
+                vehiculosData.map(v => `<option value="${v.id}">${v.placa} - ${v.marca} ${v.modelo} (${v.kilometraje?.toLocaleString() || 0} km)</option>`).join('');
+        } catch (error) {
+            console.error('Error al cargar vehículos:', error);
+        }
+    }
+
+    // Cargar componentes desde el backend
+    async function cargarComponentes() {
+        try {
+            const response = await fetch('/api/components', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar componentes');
+
+            componentesData = await response.json();
+            aplicarFiltros();
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('gridComponentes').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                    <p class="text-danger">Error al cargar componentes. Verifique la conexión.</p>
+                    <button class="btn btn-primary" onclick="recargarComponentes()">
+                        <i class="fas fa-sync-alt me-2"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Aplicar filtros
+    function aplicarFiltros() {
+        const busqueda = document.getElementById('buscarPlaca').value.toLowerCase();
+        const filtroEstado = document.getElementById('filtroEstado').value;
+        const filtroComponente = document.getElementById('filtroComponente').value;
+
+        let filtrados = componentesData;
+
+        if (busqueda) {
+            filtrados = filtrados.filter(c => c.placa && c.placa.toLowerCase().includes(busqueda));
+        }
+
+        if (filtroEstado !== 'TODOS') {
+            filtrados = filtrados.filter(c => c.estado === filtroEstado);
+        }
+
+        if (filtroComponente !== 'TODOS') {
+            filtrados = filtrados.filter(c => c.nombre === filtroComponente);
+        }
+
+        mostrarGrid(filtrados);
+    }
+
+    // Mostrar grid de componentes
+    function mostrarGrid(componentes) {
+        const grid = document.getElementById('gridComponentes');
+
+        if (componentes.length === 0) {
+            grid.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                    <h5>No hay componentes registrados</h5>
+                    <p class="text-muted">Haga clic en "Registrar Componente" para agregar uno.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = componentes.map(comp => `
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card componente-card estado-${comp.estado?.toLowerCase()} h-100" onclick="editarComponente(${comp.id})">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <i class="fas ${getComponenteIcono(comp.nombre)} fa-2x text-primary"></i>
+                                <h5 class="mt-2 mb-0">${comp.nombre?.replace('_', ' ')}</h5>
+                            </div>
+                            <span class="badge-estado bg-${getEstadoColor(comp.estado)} text-white">
+                                ${comp.estado || 'No definido'}
+                            </span>
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fas fa-truck text-muted me-2"></i>
+                            <strong>${comp.placa || 'N/A'}</strong>
+                            ${comp.marca ? `<br><small class="text-muted">${comp.marca} ${comp.modelo || ''}</small>` : ''}
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                            <small>Última inspección: ${formatearFecha(comp.fecha_inspeccion)}</small>
+                        </div>
+
+                        ${comp.observaciones ? `
+                            <div class="mt-2 p-2 bg-light rounded">
+                                <small class="text-muted">
+                                    <i class="fas fa-comment me-1"></i>
+                                    ${comp.observaciones.length > 80 ? comp.observaciones.substring(0, 80) + '...' : comp.observaciones}
+                                </small>
+                            </div>
+                        ` : ''}
+
+                        <div class="mt-3">
+                            ${comp.estado === 'CRITICO' ? '<span class="badge bg-danger"><i class="fas fa-bell me-1"></i> REQUIERE ATENCIÓN URGENTE</span>' : ''}
+                            ${comp.estado === 'MALO' ? '<span class="badge bg-warning text-dark"><i class="fas fa-tools me-1"></i> REQUIERE REPARACIÓN</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Abrir modal para nuevo componente
+    function abrirModalNuevo() {
+        document.getElementById('modalTitulo').textContent = 'Registrar Componente';
+        document.getElementById('componente_id').value = '';
+        document.getElementById('formComponente').reset();
+        document.getElementById('estado').value = 'BUENO';
+        actualizarSelectorEstado('BUENO');
+
+        const modal = new bootstrap.Modal(document.getElementById('modalComponente'));
+        modal.show();
+    }
+
+    // Editar componente existente
+    async function editarComponente(id) {
+        try {
+            const response = await fetch(`/api/components/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar componente');
+
+            const comp = await response.json();
+
+            document.getElementById('modalTitulo').textContent = 'Editar Componente';
+            document.getElementById('componente_id').value = comp.id;
+            document.getElementById('vehiculo_id').value = comp.vehiculo_id;
+            document.getElementById('nombre').value = comp.nombre;
+            document.getElementById('estado').value = comp.estado;
+            document.getElementById('observaciones').value = comp.observaciones || '';
+            actualizarSelectorEstado(comp.estado);
+
+            const modal = new bootstrap.Modal(document.getElementById('modalComponente'));
+            modal.show();
+        } catch (error) {
+            alert('Error al cargar el componente');
+        }
+    }
+
+    // Actualizar selector de estado visual
+    function actualizarSelectorEstado(estado) {
+        document.querySelectorAll('.estado-option').forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.estado === estado) {
+                opt.classList.add('selected');
+            }
+        });
+    }
+
+    // Configurar selector de estado
+    document.querySelectorAll('.estado-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const estado = opt.dataset.estado;
+            document.getElementById('estado').value = estado;
+            actualizarSelectorEstado(estado);
+        });
+    });
+
+    // Guardar componente (crear o actualizar)
+    async function guardarComponente() {
+        const id = document.getElementById('componente_id').value;
+        const data = {
+            vehiculo_id: document.getElementById('vehiculo_id').value,
+            nombre: document.getElementById('nombre').value,
+            estado: document.getElementById('estado').value,
+            observaciones: document.getElementById('observaciones').value
+        };
+
+        if (!data.vehiculo_id || !data.nombre || !data.estado) {
+            alert('❌ Por favor complete todos los campos requeridos');
+            return;
+        }
+
+        const btnGuardar = document.querySelector('#modalComponente .btn-primary');
+        const originalText = btnGuardar.innerHTML;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+        btnGuardar.disabled = true;
+
+        try {
+            const url = id ? `/api/components/${id}` : '/api/components';
+            const method = id ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert('✅ ' + result.mensaje);
+                bootstrap.Modal.getInstance(document.getElementById('modalComponente')).hide();
+                cargarComponentes();
+            } else {
+                alert('❌ Error: ' + (result.error || 'No se pudo guardar'));
+            }
+        } catch (error) {
+            alert('❌ Error de conexión');
+        } finally {
+            btnGuardar.innerHTML = originalText;
+            btnGuardar.disabled = false;
+        }
+    }
+
+    // Recargar componentes
+    function recargarComponentes() {
+        cargarComponentes();
+    }
+
+    // Limpiar filtros
+    function limpiarFiltros() {
+        document.getElementById('buscarPlaca').value = '';
+        document.getElementById('filtroEstado').value = 'TODOS';
+        document.getElementById('filtroComponente').value = 'TODOS';
+        aplicarFiltros();
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+        if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Cargar datos al iniciar
+    cargarVehiculos();
+    cargarComponentes();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Configuración</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .config-card {
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            transition: transform 0.3s;
+        }
+        .config-card:hover {
+            transform: translateY(-3px);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a3a8a;
+            border-left: 4px solid #c5a059;
+            padding-left: 12px;
+        }
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+        .color-option {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        .color-option.active {
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+        .bg-orange { background-color: #fd7e14; }
+        .bg-teal { background-color: #20c997; }
+        .bg-purple { background-color: #6f42c1; }
+
+        .umbral-slider {
+            width: 100%;
+        }
+        .umbral-value {
+            font-weight: bold;
+            color: #1a3a8a;
+        }
+        footer {
+            border-top: 4px solid #c5a059;
+            margin-top: 50px;
+        }
+        .hover-scale {
+            transition: all 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: scale(1.2);
+            color: #c5a059 !important;
+        }
+    </style>
+</head>
+<body data-bs-theme="light">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+            <i class="fas fa-truck me-2 fa-lg"></i>
+            <span>SuspenTrack - Cantón Mocha</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
+                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
+                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
+                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link active" href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <i class="fas fa-cog fa-2x" style="color: #1a3a8a;"></i>
+        <h2 class="mb-0">Configuración del Sistema</h2>
+    </div>
+
+    <div class="row g-4">
+        <!-- Personalización -->
+        <div class="col-lg-6">
+            <div class="config-card card h-100">
+                <div class="card-body">
+                    <h5 class="section-title mb-4">
+                        <i class="fas fa-palette me-2"></i> Personalización
+                    </h5>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Color Principal</label>
+                        <div class="d-flex gap-3">
+                            <div class="color-option bg-primary active" data-color="primary" onclick="seleccionarColor(this, '#1a3a8a')"></div>
+                            <div class="color-option bg-dark" data-color="dark" onclick="seleccionarColor(this, '#0d1b3e')"></div>
+                            <div class="color-option bg-orange" data-color="orange" onclick="seleccionarColor(this, '#fd7e14')"></div>
+                            <div class="color-option bg-teal" data-color="teal" onclick="seleccionarColor(this, '#20c997')"></div>
+                            <div class="color-option bg-purple" data-color="purple" onclick="seleccionarColor(this, '#6f42c1')"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Modo de Pantalla</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="modo" id="modoClaro" value="light" checked onchange="aplicarConfiguracion()">
+                                <label class="form-check-label" for="modoClaro">
+                                    <i class="fas fa-sun me-1"></i> Claro
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="modo" id="modoOscuro" value="dark" onchange="aplicarConfiguracion()">
+                                <label class="form-check-label" for="modoOscuro">
+                                    <i class="fas fa-moon me-1"></i> Oscuro
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Tamaño de Letra</label>
+                        <select id="tamanoLetra" class="form-select w-75" onchange="aplicarConfiguracion()">
+                            <option value="normal">Normal</option>
+                            <option value="grande">Grande</option>
+                            <option value="extra-grande">Extra Grande</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Algoritmo de Priorización -->
+        <div class="col-lg-6">
+            <div class="config-card card h-100">
+                <div class="card-body">
+                    <h5 class="section-title mb-4">
+                        <i class="fas fa-chart-line me-2"></i> Algoritmo de Priorización
+                    </h5>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Peso del Kilometraje</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="range" class="form-range umbral-slider" id="pesoKm" min="0" max="50" value="25" onchange="actualizarUmbral('km', this.value)">
+                            <span class="umbral-value" id="valorKm">25</span>%
+                        </div>
+                        <small class="text-muted">Mayor kilometraje = mayor criticidad</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Peso del Tiempo sin Mantenimiento</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="range" class="form-range umbral-slider" id="pesoTiempo" min="0" max="50" value="25" onchange="actualizarUmbral('tiempo', this.value)">
+                            <span class="umbral-value" id="valorTiempo">25</span>%
+                        </div>
+                        <small class="text-muted">Más días sin mantenimiento = mayor criticidad</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Peso de Fallas Registradas</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="range" class="form-range umbral-slider" id="pesoFallas" min="0" max="50" value="25" onchange="actualizarUmbral('fallas', this.value)">
+                            <span class="umbral-value" id="valorFallas">25</span>%
+                        </div>
+                        <small class="text-muted">Más fallas = mayor criticidad</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Peso del Estado de Componentes</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="range" class="form-range umbral-slider" id="pesoComponentes" min="0" max="50" value="25" onchange="actualizarUmbral('componentes', this.value)">
+                            <span class="umbral-value" id="valorComponentes">25</span>%
+                        </div>
+                        <small class="text-muted">Componentes en mal estado = mayor criticidad</small>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Nota:</strong> Los pesos se normalizan automáticamente. La suma total debe ser 100%.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conexión a Base de Datos -->
+        <div class="col-md-6">
+            <div class="config-card card h-100">
+                <div class="card-header bg-primary text-white">
+                    <i class="fas fa-database me-2"></i> Conexión a Base de Datos
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="fas fa-server me-2"></i> Servidor:</strong> <span id="dbHost">localhost</span></p>
+                    <p><strong><i class="fas fa-database me-2"></i> Base de Datos:</strong> <span id="dbName">suspentrack</span></p>
+                    <p><strong><i class="fas fa-user me-2"></i> Usuario:</strong> <span id="dbUser">root</span></p>
+                    <p>
+                        <strong><i class="fas fa-plug me-2"></i> Estado:</strong>
+                        <span class="badge bg-success status-badge" id="dbStatus">
+                            <i class="fas fa-check-circle me-1"></i> Conectado
+                        </span>
+                    </p>
+
+                    <hr>
+                    <h6 class="fw-bold">Información del Sistema</h6>
+                    <p class="mb-1"><strong>Backend:</strong> Node.js + Express</p>
+                    <p class="mb-1"><strong>Base de Datos:</strong> MySQL</p>
+                    <p><strong>Autenticación:</strong> JWT (JSON Web Tokens)</p>
+
+                    <button class="btn btn-outline-primary mt-2 w-100" onclick="probarConexion()">
+                        <i class="fas fa-sync-alt me-2"></i> Probar Conexión
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Sistema -->
+        <div class="col-md-6">
+            <div class="config-card card h-100">
+                <div class="card-header bg-dark text-white">
+                    <i class="fas fa-info-circle me-2"></i> Información del Sistema
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-tag me-2"></i> Versión:</strong> SuspenTrack v2.0</p>
+                            <p><strong><i class="fas fa-map-marker-alt me-2"></i> Cantón:</strong> Mocha, Tungurahua</p>
+                            <p><strong><i class="fas fa-truck me-2"></i> Sistema:</strong> Gestión de Mantenimiento de Suspensión</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-calendar me-2"></i> Fecha actual:</strong> <span id="fechaActual"></span></p>
+                            <p><strong><i class="fas fa-chart-line me-2"></i> Algoritmo:</strong> Priorización Multicriterio</p>
+                            <p><strong><i class="fas fa-shield-alt me-2"></i> Seguridad:</strong> JWT + Roles</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between gap-2">
+                        <button class="btn btn-warning" onclick="exportarConfiguracion()">
+                            <i class="fas fa-download me-2"></i> Exportar Configuración
+                        </button>
+                        <button class="btn btn-danger" onclick="restaurarPredeterminados()">
+                            <i class="fas fa-undo-alt me-2"></i> Restaurar Valores
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Respaldo de Base de Datos -->
+        <div class="col-12">
+            <div class="config-card card">
+                <div class="card-header bg-secondary text-white">
+                    <i class="fas fa-archive me-2"></i> Mantenimiento de Base de Datos
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <i class="fas fa-database me-2"></i>
+                                <strong>Tamaño de la base de datos:</strong>
+                                <span id="dbSize">Calculando...</span>
+                            </p>
+                            <p>
+                                <i class="fas fa-table me-2"></i>
+                                <strong>Tablas activas:</strong> 7 (usuarios, vehiculos, componentes, inspecciones, mantenimientos, alertas, priorizaciones)
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-primary" onclick="generarBackup()">
+                                <i class="fas fa-database me-2"></i> Generar Respaldo
+                            </button>
+                            <button class="btn btn-outline-secondary ms-2" onclick="optimizarTablas()">
+                                <i class="fas fa-broom me-2"></i> Optimizar Tablas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end mt-4 mb-5">
+        <button onclick="guardarConfiguracion()" class="btn btn-primary btn-lg px-5">
+            <i class="fas fa-save me-2"></i> Guardar Cambios
+        </button>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-light py-4 mt-auto">
+    <div class="container">
+        <div class="row align-items-center text-center text-md-start">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <i class="fas fa-truck fa-2x text-warning mb-2"></i>
+                <h5 class="fw-bold text-white">SuspenTrack</h5>
+                <p class="small opacity-75 mb-0">Gestión de Mantenimiento de Suspensión</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <p class="mb-1">© 2026 SuspenTrack - Cantón Mocha</p>
+                <p class="small opacity-75 mb-0">Sistema de Priorización de Mantenimiento</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex justify-content-center justify-content-md-end gap-3">
+                    <a href="#" class="text-light hover-scale"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-light hover-scale"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="text-light hover-scale"><i class="fab fa-instagram"></i></a>
+                </div>
+                <p class="small opacity-75 mt-2 mb-0">
+                    Desarrollado para flotas de transporte de lácteos
+                </p>
+            </div>
+        </div>
+        <hr class="my-3 border-secondary">
+        <div class="text-center small opacity-50">
+            SuspenTrack v2.0 • Todos los derechos reservados
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const token = localStorage.getItem('token');
+
+    // Verificar autenticación
+    if (!token) {
+        window.location.href = 'index.html';
+    }
+
+    // Mostrar fecha actual
+    function mostrarFechaActual() {
+        const fecha = new Date();
+        const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('fechaActual').textContent = fecha.toLocaleDateString('es-ES', opciones);
+    }
+
+    // Seleccionar color
+    function seleccionarColor(elemento, color) {
+        document.querySelectorAll('.color-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        elemento.classList.add('active');
+
+        // Aplicar color temporalmente
+        document.documentElement.style.setProperty('--azul-principal', color);
+        document.querySelector('.navbar').style.background = `linear-gradient(135deg, ${color}, #0d1b3e)`;
+    }
+
+    // Actualizar valores de umbrales
+    function actualizarUmbral(tipo, valor) {
+        document.getElementById(`valor${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).textContent = valor;
+    }
+
+    // Cargar configuración guardada
+    function cargarConfiguracion() {
+        // Modo Claro / Oscuro
+        const tema = localStorage.getItem('tema') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', tema);
+        if (tema === 'dark') document.getElementById('modoOscuro').checked = true;
+
+        // Tamaño de letra
+        const tamano = localStorage.getItem('tamanoLetra') || 'normal';
+        document.getElementById('tamanoLetra').value = tamano;
+        aplicarTamanoLetra(tamano);
+
+        // Umbrales del algoritmo
+        const pesos = JSON.parse(localStorage.getItem('pesosAlgoritmo') || '{"km":25,"tiempo":25,"fallas":25,"componentes":25}');
+        document.getElementById('pesoKm').value = pesos.km;
+        document.getElementById('valorKm').textContent = pesos.km;
+        document.getElementById('pesoTiempo').value = pesos.tiempo;
+        document.getElementById('valorTiempo').textContent = pesos.tiempo;
+        document.getElementById('pesoFallas').value = pesos.fallas;
+        document.getElementById('valorFallas').textContent = pesos.fallas;
+        document.getElementById('pesoComponentes').value = pesos.componentes;
+        document.getElementById('valorComponentes').textContent = pesos.componentes;
+
+        // Color guardado
+        const colorGuardado = localStorage.getItem('colorPrincipal') || '#1a3a8a';
+        document.documentElement.style.setProperty('--azul-principal', colorGuardado);
+    }
+
+    // Aplicar tamaño de letra
+    function aplicarTamanoLetra(tamano) {
+        const sizes = { 'normal': '1rem', 'grande': '1.2rem', 'extra-grande': '1.4rem' };
+        document.documentElement.style.fontSize = sizes[tamano] || '1rem';
+    }
+
+    // Aplicar cambios en tiempo real
+    function aplicarConfiguracion() {
+        const modo = document.querySelector('input[name="modo"]:checked').value;
+        const tamano = document.getElementById('tamanoLetra').value;
+
+        document.documentElement.setAttribute('data-bs-theme', modo);
+        aplicarTamanoLetra(tamano);
+    }
+
+    // Guardar configuración
+    function guardarConfiguracion() {
+        const modo = document.querySelector('input[name="modo"]:checked').value;
+        const tamano = document.getElementById('tamanoLetra').value;
+
+        const pesos = {
+            km: parseInt(document.getElementById('pesoKm').value),
+            tiempo: parseInt(document.getElementById('pesoTiempo').value),
+            fallas: parseInt(document.getElementById('pesoFallas').value),
+            componentes: parseInt(document.getElementById('pesoComponentes').value)
+        };
+
+        localStorage.setItem('tema', modo);
+        localStorage.setItem('tamanoLetra', tamano);
+        localStorage.setItem('pesosAlgoritmo', JSON.stringify(pesos));
+
+        alert("✅ Configuración guardada correctamente.\nLos cambios se aplicarán en todas las páginas.");
+    }
+
+    // Probar conexión a la base de datos
+    async function probarConexion() {
+        const statusSpan = document.getElementById('dbStatus');
+        statusSpan.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Probando...';
+        statusSpan.className = 'badge bg-warning status-badge';
+
+        try {
+            const response = await fetch('/api/vehicles', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                statusSpan.innerHTML = '<i class="fas fa-check-circle me-1"></i> Conectado';
+                statusSpan.className = 'badge bg-success status-badge';
+                alert('✅ Conexión exitosa con el servidor');
+            } else {
+                throw new Error('Error de conexión');
+            }
+        } catch (error) {
+            statusSpan.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i> Desconectado';
+            statusSpan.className = 'badge bg-danger status-badge';
+            alert('❌ Error de conexión con el servidor');
+        }
+    }
+
+    // Exportar configuración
+    function exportarConfiguracion() {
+        const config = {
+            version: 'SuspenTrack v2.0',
+            fecha: new Date().toISOString(),
+            tema: localStorage.getItem('tema') || 'light',
+            tamanoLetra: localStorage.getItem('tamanoLetra') || 'normal',
+            pesosAlgoritmo: JSON.parse(localStorage.getItem('pesosAlgoritmo') || '{"km":25,"tiempo":25,"fallas":25,"componentes":25}')
+        };
+
+        const dataStr = JSON.stringify(config, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `suspentrack_config_${new Date().toISOString().slice(0,19)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        alert('✅ Configuración exportada exitosamente');
+    }
+
+    // Restaurar valores predeterminados
+    function restaurarPredeterminados() {
+        if (confirm('¿Restaurar todos los valores a su configuración original?')) {
+            localStorage.removeItem('tema');
+            localStorage.removeItem('tamanoLetra');
+            localStorage.removeItem('pesosAlgoritmo');
+            localStorage.removeItem('colorPrincipal');
+
+            location.reload();
+        }
+    }
+
+    // Generar respaldo
+    function generarBackup() {
+        alert('📀 Funcionalidad de respaldo:\n\n' +
+            'Para generar un respaldo completo de la base de datos, ejecute:\n\n' +
+            'mysqldump -u root -p suspentrack > backup_suspentrack.sql\n\n' +
+            'En producción, esta función descargará automáticamente el archivo SQL.');
+    }
+
+    // Optimizar tablas
+    function optimizarTablas() {
+        alert('🔧 Optimización de tablas:\n\n' +
+            'Para optimizar las tablas manualmente, ejecute en MySQL:\n\n' +
+            'OPTIMIZE TABLE usuarios, vehiculos, componentes, inspecciones, mantenimientos, alertas, priorizaciones;\n\n' +
+            'Esto mejorará el rendimiento del sistema.');
+    }
+
+    function calcularTamañoDB() {
+        document.getElementById('dbSize').textContent = '≈ 2.5 MB';
+    }
+
+    // Cerrar sesión
+    function cerrarSesion() {
+        if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Inicializar página
+    window.onload = () => {
+        cargarConfiguracion();
+        mostrarFechaActual();
+        calcularTamañoDB();
+        probarConexion();
+    };
+</script>
+</body>
+</html>

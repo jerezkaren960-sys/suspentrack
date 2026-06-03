@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Registrar Vehículo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .form-header {
+            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
+            color: white;
+            padding: 20px;
+            border-bottom: 4px solid #c5a059;
+        }
+        .form-header i {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-save:hover {
+            background: #c5a059;
+            color: #000;
+            transform: translateY(-2px);
+        }
+        .btn-cancel {
+            background: #6c757d;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .required:after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+            <i class="fas fa-truck me-2"></i>
+            <span>SuspenTrack - Mocha</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
+                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
+                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
+                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
+                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
+                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-card">
+                <div class="form-header">
+                    <i class="fas fa-plus-circle"></i>
+                    <h2 class="d-inline-block">Registrar Nuevo Vehículo</h2>
+                    <p class="mt-2 mb-0 opacity-75">Complete los datos del vehículo para agregarlo a la flota</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form id="vehiculoForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required">Placa</label>
+                                <input type="text" id="placa" class="form-control" placeholder="Ej: ABC-1234" required>
+                                <small class="text-muted">Formato: 3 letras y 3-4 números</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required">Marca</label>
+                                <select id="marca" class="form-control" required>
+                                    <option value="">Seleccionar marca...</option>
+                                    <option value="Chevrolet">Chevrolet</option>
+                                    <option value="Ford">Ford</option>
+                                    <option value="Hino">Hino</option>
+                                    <option value="Isuzu">Isuzu</option>
+                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                    <option value="Volvo">Volvo</option>
+                                    <option value="International">International</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required">Modelo</label>
+                                <input type="text" id="modelo" class="form-control" placeholder="Ej: NPR, Cargo, 300" required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Año</label>
+                                <input type="number" id="anio" class="form-control" placeholder="Ej: 2020" min="1990" max="2026">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kilometraje Actual</label>
+                                <input type="number" id="kilometraje" class="form-control" placeholder="0" value="0">
+                                <small class="text-muted">Kilómetros recorridos</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Capacidad de Carga (kg)</label>
+                                <input type="number" id="capacidad_carga" class="form-control" placeholder="Ej: 3500" value="0">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Frecuencia de Uso</label>
+                                <select id="frecuencia_uso" class="form-control">
+                                    <option value="BAJA">Baja</option>
+                                    <option value="MEDIA" selected>Media</option>
+                                    <option value="ALTA">Alta</option>
+                                </select>
+                                <small class="text-muted">Influye en el cálculo de criticidad</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado General</label>
+                                <select id="estado_general" class="form-control">
+                                    <option value="OPERATIVO">Operativo</option>
+                                    <option value="MANTENIMIENTO">En Mantenimiento</option>
+                                    <option value="INOPERATIVO">Inoperativo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Nota:</strong> Al registrar un vehículo, se crearán automáticamente sus 6 componentes de suspensión
+                            (amortiguadores, resortes, rótulas, bujes, brazos y barras estabilizadoras) con estado "Bueno".
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <button type="button" class="btn btn-cancel" onclick="window.location.href='vehiculos.html'">
+                                <i class="fas fa-times me-2"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-save">
+                                <i class="fas fa-save me-2"></i> Guardar Vehículo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Verificar autenticación
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'index.html';
+    }
+
+    // Mostrar información del usuario
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.nombre) {
+        console.log('Usuario:', user.nombre, 'Rol:', user.rol);
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('vehiculoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Mostrar loading en el botón
+        const btnSubmit = document.querySelector('button[type="submit"]');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+        btnSubmit.disabled = true;
+
+        // Validaciones
+        const placa = document.getElementById('placa').value.trim().toUpperCase();
+        if (!placa) {
+            alert('❌ La placa es requerida');
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        const marca = document.getElementById('marca').value;
+        if (!marca) {
+            alert('❌ La marca es requerida');
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        const modelo = document.getElementById('modelo').value.trim();
+        if (!modelo) {
+            alert('❌ El modelo es requerido');
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        // Preparar datos
+        const data = {
+            placa: placa,
+            marca: marca,
+            modelo: modelo,
+            anio: parseInt(document.getElementById('anio').value) || null,
+            kilometraje: parseInt(document.getElementById('kilometraje').value) || 0,
+            capacidad_carga: parseFloat(document.getElementById('capacidad_carga').value) || 0,
+            frecuencia_uso: document.getElementById('frecuencia_uso').value,
+            estado_general: document.getElementById('estado_general').value
+        };
+
+        try {
+            const response = await fetch('/api/vehicles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Mostrar éxito
+                alert('✅ ' + result.mensaje);
+
+                // Preguntar si quiere registrar otro o ver la lista
+                const continuar = confirm('¿Desea registrar otro vehículo?\n\nPresione "Aceptar" para registrar otro\nPresione "Cancelar" para ver la lista de vehículos');
+
+                if (continuar) {
+                    // Limpiar formulario
+                    document.getElementById('vehiculoForm').reset();
+                    document.getElementById('placa').focus();
+                } else {
+                    // Ir a lista de vehículos
+                    window.location.href = 'vehiculos.html';
+                }
+            } else {
+                // Mostrar error del servidor
+                alert('❌ Error: ' + (result.error || 'No se pudo registrar el vehículo'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ Error de conexión. Verifique que el servidor esté corriendo.');
+        } finally {
+            // Restaurar botón
+            btnSubmit.innerHTML = originalText;
+            btnSubmit.disabled = false;
+        }
+    });
+
+    // Función para cerrar sesión
+    function cerrarSesion() {
+        if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Validar formato de placa mientras escribe
+    document.getElementById('placa').addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase();
+
+        // Validación básica de formato
+        const regex = /^[A-Z0-9-]*$/;
+        if (!regex.test(this.value)) {
+            this.value = this.value.replace(/[^A-Z0-9-]/g, '');
+        }
+    });
+
+    // Validar año
+    document.getElementById('anio').addEventListener('input', function(e) {
+        const anio = parseInt(this.value);
+        if (anio && (anio < 1990 || anio > 2026)) {
+            this.setCustomValidity('El año debe estar entre 1990 y 2026');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Inicio de Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a3a8a 0%, #0d1b3e 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Fondo con patrones */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path fill="white" d="M20,50 L30,40 L40,50 L30,60 Z M70,30 L80,20 L90,30 L80,40 Z M50,80 L60,70 L70,80 L60,90 Z"/></svg>');
+            background-repeat: repeat;
+            pointer-events: none;
+        }
+
+        /* Camiones animados en el fondo */
+        .bg-trucks {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .truck {
+            position: absolute;
+            font-size: 40px;
+            animation: drive 20s linear infinite;
+        }
+
+        .truck:nth-child(1) { animation-duration: 25s; left: -50px; }
+        .truck:nth-child(2) { animation-duration: 35s; left: -100px; animation-delay: 5s; }
+        .truck:nth-child(3) { animation-duration: 30s; left: -80px; animation-delay: 12s; }
+
+        @keyframes drive {
+            from { transform: translateX(0); }
+            to { transform: translateX(calc(100vw + 100px)); }
+        }
+
+        /* Tarjeta de login */
+        .login-container {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Header de la tarjeta */
+        .login-header {
+            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .login-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #c5a059;
+        }
+
+        .logo-icon {
+            font-size: 64px;
+            color: #c5a059;
+            margin-bottom: 15px;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+        }
+
+        .login-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .login-header p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 0;
+        }
+
+        /* Body de la tarjeta */
+        .login-body {
+            padding: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1a3a8a;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #c5a059;
+        }
+
+        .input-group-custom {
+            position: relative;
+        }
+
+        .input-group-custom input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .input-group-custom input:focus {
+            outline: none;
+            border-color: #c5a059;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2);
+        }
+
+        .input-group-custom i {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .input-group-custom i:hover {
+            color: #1a3a8a;
+        }
+
+        /* Botón de login */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #c5a059, #b8944a);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login i {
+            margin-right: 8px;
+        }
+
+        /* Información adicional */
+        .login-footer {
+            text-align: center;
+            padding: 20px 35px 35px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .info-text i {
+            color: #c5a059;
+            margin-right: 5px;
+        }
+
+        .badge-version {
+            display: inline-block;
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            color: #1a3a8a;
+        }
+
+        /* Alertas */
+        .alert-custom {
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .login-body {
+                padding: 25px;
+            }
+            .login-footer {
+                padding: 20px 25px 25px;
+            }
+            .login-header {
+                padding: 20px;
+            }
+            .logo-icon {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Camiones decorativos -->
+<div class="bg-trucks">
+    <div class="truck"><i class="fas fa-truck"></i></div>
+    <div class="truck"><i class="fas fa-truck-moving"></i></div>
+    <div class="truck"><i class="fas fa-shuttle-van"></i></div>
+</div>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <h1>SuspenTrack</h1>
+            <p>Sistema de Gestión de Mantenimiento de Suspensión</p>
+            <p class="mt-1" style="font-size: 12px;">Cantón Mocha - Tungurahua</p>
+        </div>
+
+        <div class="login-body">
+            <div id="alertMessage"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                    <div class="input-group-custom">
+                        <input type="email" id="correo" placeholder="admin@suspentrack.com" autocomplete="email" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <div class="input-group-custom">
+                        <input type="password" id="password" placeholder="Ingrese su contraseña" autocomplete="current-password" required>
+                        <i class="fas fa-eye" id="togglePassword" style="cursor: pointer;"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <div class="info-text">
+                <i class="fas fa-info-circle"></i> Sistema exclusivo para personal autorizado
+            </div>
+            <div class="info-text">
+                <i class="fas fa-shield-alt"></i> Datos protegidos con encriptación JWT
+            </div>
+            <div class="mt-2">
+                    <span class="badge-version">
+                        <i class="fas fa-code-branch"></i> SuspenTrack v2.0
+                    </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Elementos del DOM
+    const loginForm = document.getElementById('loginForm');
+    const correoInput = document.getElementById('correo');
+    const passwordInput = document.getElementById('password');
+    const btnLogin = document.getElementById('btnLogin');
+    const alertContainer = document.getElementById('alertMessage');
+
+    // Mostrar mensaje de alerta
+    function mostrarAlerta(mensaje, tipo = 'danger') {
+        alertContainer.innerHTML = `
+                <div class="alert alert-${tipo} alert-custom fade show" role="alert">
+                    <i class="fas ${tipo === 'danger' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                    ${mensaje}
+                    <button type="button" class="btn-close float-end" data-bs-dismiss="alert" style="font-size: 10px;"></button>
+                </div>
+            `;
+
+        // Auto cerrar después de 5 segundos
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) alert.remove();
+        }, 5000);
+    }
+
+    // Limpiar alertas
+    function limpiarAlertas() {
+        alertContainer.innerHTML = '';
+    }
+
+    // Mostrar loading en el botón
+    function mostrarLoading() {
+        btnLogin.disabled = true;
+        btnLogin.innerHTML = '<span class="loading"></span> Verificando credenciales...';
+    }
+
+    // Restaurar botón
+    function restaurarBoton() {
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar al Sistema';
+    }
+
+    // Toggle para mostrar/ocultar contraseña
+    const togglePassword = document.getElementById('togglePassword');
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+
+    // Validar campos antes de enviar
+    function validarCampos() {
+        const correo = correoInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!correo) {
+            mostrarAlerta('Por favor ingrese su correo electrónico', 'warning');
+            correoInput.focus();
+            return false;
+        }
+
+        if (!password) {
+            mostrarAlerta('Por favor ingrese su contraseña', 'warning');
+            passwordInput.focus();
+            return false;
+        }
+
+        // Validación básica de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(correo)) {
+            mostrarAlerta('Ingrese un correo electrónico válido', 'warning');
+            correoInput.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    // Manejar el envío del formulario
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        limpiarAlertas();
+
+        if (!validarCampos()) return;
+
+        const correo = correoInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        mostrarLoading();
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ correo, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Guardar token y datos del usuario
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.usuario));
+
+                // Mostrar mensaje de éxito
+                mostrarAlerta('✅ Inicio de sesión exitoso. Redirigiendo...', 'success');
+
+                // Redirigir al dashboard
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                restaurarBoton();
+                mostrarAlerta(data.error || 'Credenciales inválidas. Verifique sus datos.', 'danger');
+            }
+        } catch (error) {
+            restaurarBoton();
+            console.error('Error de conexión:', error);
+            mostrarAlerta('Error de conexión con el servidor. Verifique que el backend esté corriendo.', 'danger');
+        }
+    });
+
+    // Verificar si ya hay sesión activa
+    const token = localStorage.getItem('token');
+    if (token) {
+        // Verificar si el token sigue siendo válido
+        fetch('/api/vehicles', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Token válido, redirigir al dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                // Token inválido, limpiar storage
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        }).catch(() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        });
+    }
+
+    // Auto-focus en el campo de correo
+    correoInput.focus();
+
+    // Presionar Enter para enviar
+    correoInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
+    });
+    passwordInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loginForm.dispatchEvent(new Event('submit'));
+    });
+</script>
+
+<!-- Bootstrap JS (para los alerts) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

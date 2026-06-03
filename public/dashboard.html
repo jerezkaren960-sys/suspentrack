@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuspenTrack - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #f4f6f9;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a3a8a, #0d1b3e);
+            position: sticky;
+            top: 0;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px 20px;
+            transition: 0.3s;
+            border-radius: 8px;
+            margin: 4px 10px;
+        }
+        .sidebar a:hover {
+            background: #c5a059;
+            color: #000;
+            transform: translateX(5px);
+        }
+        .sidebar a.active {
+            background: #c5a059;
+            color: #000;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+            width: 25px;
+        }
+        .card-dashboard {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        .card-dashboard:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .card-icon {
+            font-size: 40px;
+            opacity: 0.8;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .kpi-card {
+            border-left: 4px solid;
+        }
+        .kpi-card.primary { border-left-color: #1a3a8a; }
+        .kpi-card.success { border-left-color: #198754; }
+        .kpi-card.danger { border-left-color: #dc3545; }
+        .kpi-card.warning { border-left-color: #ffc107; }
+        .kpi-card.info { border-left-color: #0dcaf0; }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1a3a8a;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+            background: #c5a059;
+        }
+        .alerta-item {
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .alerta-item:hover {
+            background: #f8f9fa;
+        }
+        .critico { border-left: 4px solid #dc3545; }
+        .alto { border-left: 4px solid #fd7e14; }
+        .medio { border-left: 4px solid #ffc107; }
+        .bajo { border-left: 4px solid #198754; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="text-center py-4">
+                <i class="fas fa-truck fa-3x text-warning"></i>
+                <h4 class="text-white mt-2">SuspenTrack</h4>
+                <small class="text-white-50">Cantón Mocha</small>
+            </div>
+            <hr class="text-white-50 mx-3">
+            <nav>
+                <a href="dashboard.html" class="active">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="vehiculos.html">
+                    <i class="fas fa-truck"></i> Vehículos
+                </a>
+                <a href="componentes.html">
+                    <i class="fas fa-cogs"></i> Componentes
+                </a>
+                <a href="inspecciones.html">
+                    <i class="fas fa-search"></i> Inspecciones
+                </a>
+                <a href="mantenimiento.html">
+                    <i class="fas fa-tools"></i> Mantenimientos
+                </a>
+                <a href="alertas.html">
+                    <i class="fas fa-bell"></i> Alertas
+                </a>
+                <a href="reportes.html">
+                    <i class="fas fa-file-pdf"></i> Reportes
+                </a>
+                <a href="usuario.html">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+                <a href="configuracion.html">
+                    <i class="fas fa-cog"></i> Configuración
+                </a>
+            </nav>
+            <hr class="text-white-50 mx-3">
+            <div class="text-center mt-auto p-3">
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i> <span id="userName">Usuario</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>
+                        Dashboard de Gestión
+                    </h2>
+                    <p class="text-muted mt-2">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        <span id="fechaActual"></span>
+                    </p>
+                </div>
+                <div>
+                    <span class="badge bg-primary p-2" id="ultimaActualizacion">
+                        <i class="fas fa-clock me-1"></i> Actualizado ahora
+                    </span>
+                </div>
+            </div>
+
+            <!-- KPIs - Tarjetas de estadísticas -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card card-dashboard kpi-card primary">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Total Vehículos</h6>
+                                    <h2 class="stats-number" id="totalVehiculos">0</h2>
+                                    <small class="text-muted">Flota registrada</small>
+                                </div>
+                                <i class="fas fa-truck card-icon text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard kpi-card success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Vehículos Operativos</h6>
+                                    <h2 class="stats-number" id="operativos">0</h2>
+                                    <small class="text-muted">En buen estado</small>
+                                </div>
+                                <i class="fas fa-check-circle card-icon text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard kpi-card danger">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Vehículos Críticos</h6>
+                                    <h2 class="stats-number" id="criticos">0</h2>
+                                    <small class="text-muted">Requieren atención</small>
+                                </div>
+                                <i class="fas fa-exclamation-triangle card-icon text-danger pulse"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard kpi-card warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Costos Acumulados</h6>
+                                    <h2 class="stats-number" id="costos">$0</h2>
+                                    <small class="text-muted">Este año</small>
+                                </div>
+                                <i class="fas fa-dollar-sign card-icon text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segunda fila de KPIs -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card card-dashboard">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Mantenimientos Realizados</h6>
+                                    <h3 id="mantenimientosRealizados">0</h3>
+                                </div>
+                                <i class="fas fa-check-double fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Mantenimientos Pendientes</h6>
+                                    <h3 id="mantenimientosPendientes" class="text-warning">0</h3>
+                                </div>
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Componentes Críticos</h6>
+                                    <h3 id="componentesCriticos">0</h3>
+                                </div>
+                                <i class="fas fa-cogs fa-2x text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card card-dashboard">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Alertas Activas</h6>
+                                    <h3 id="alertasActivas" class="text-danger">0</h3>
+                                </div>
+                                <i class="fas fa-bell fa-2x text-danger pulse"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICOS -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <h5><i class="fas fa-chart-pie me-2"></i> Estado de la Flota</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoEstadoFlota" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <h5><i class="fas fa-chart-bar me-2"></i> Mantenimientos por Mes</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoMantenimientos" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <h5><i class="fas fa-exclamation-triangle me-2"></i> Componentes con Mayor Desgaste</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoComponentes" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <h5><i class="fas fa-chart-line me-2"></i> Vehículos por Criticidad</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoCriticidad" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALERTAS RECIENTES -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-dashboard">
+                        <div class="card-header bg-white border-0 pt-3">
+                            <h5><i class="fas fa-bell me-2"></i> Alertas Recientes</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th>Vehículo</th>
+                                        <th>Nivel</th>
+                                        <th>Mensaje</th>
+                                        <th>Fecha</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tablaAlertas">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botón de actualización flotante -->
+<button class="refresh-btn" onclick="cargarDashboard()">
+    <i class="fas fa-sync-alt"></i>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const token = localStorage.getItem('token');
+    let graficos = {};
+
+    // Verificar autenticación
+    if (!token) {
+        window.location.href = 'index.html';
+    }
+
+    // Mostrar nombre del usuario
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    document.getElementById('userName').textContent = user.nombre || 'Usuario';
+
+    // Mostrar fecha actual
+    function mostrarFecha() {
+        const fecha = new Date();
+        const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('fechaActual').textContent = fecha.toLocaleDateString('es-ES', opciones);
+    }
+
+    // Cargar datos del dashboard
+    async function cargarDashboard() {
+        try {
+            // Mostrar loading
+            document.getElementById('ultimaActualizacion').innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Actualizando...';
+
+            const response = await fetch('/api/dashboard', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar dashboard');
+            }
+
+            const data = await response.json();
+
+            // Actualizar KPIs
+            document.getElementById('totalVehiculos').innerText = data.total_vehiculos || 0;
+            document.getElementById('operativos').innerText = data.vehiculos_operativos || 0;
+            document.getElementById('criticos').innerText = data.vehiculos_criticos || 0;
+            document.getElementById('costos').innerText = '$' + (data.costos_acumulados || 0).toLocaleString();
+            document.getElementById('mantenimientosRealizados').innerText = data.mantenimientos_realizados || 0;
+            document.getElementById('mantenimientosPendientes').innerText = data.mantenimientos_pendientes || 0;
+
+            // Calcular componentes críticos
+            let compCriticos = 0;
+            if (data.componentes_desgaste) {
+                compCriticos = data.componentes_desgaste.reduce((sum, c) => sum + (c.criticos || 0), 0);
+            }
+            document.getElementById('componentesCriticos').innerText = compCriticos;
+            document.getElementById('alertasActivas').innerText = data.alertas_recientes ? data.alertas_recientes.length : 0;
+
+            // Actualizar gráficos
+            actualizarGraficos(data);
+
+            // Actualizar tabla de alertas
+            actualizarTablaAlertas(data.alertas_recientes || []);
+
+            // Actualizar timestamp
+            const ahora = new Date();
+            document.getElementById('ultimaActualizacion').innerHTML = '<i class="fas fa-clock me-1"></i> Actualizado ' +
+                ahora.toLocaleTimeString('es-ES');
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('ultimaActualizacion').innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i> Error de conexión';
+        }
+    }
+
+    // Actualizar gráficos
+    function actualizarGraficos(data) {
+        // Gráfico de estado de la flota
+        if (graficos.estadoFlota) graficos.estadoFlota.destroy();
+        graficos.estadoFlota = new Chart(document.getElementById('graficoEstadoFlota'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Operativos', 'En Mantenimiento', 'Inoperativos'],
+                datasets: [{
+                    data: [
+                        data.vehiculos_operativos || 0,
+                        0, // En mantenimiento - se puede agregar después
+                        0  // Inoperativos - se puede agregar después
+                    ],
+                    backgroundColor: ['#198754', '#ffc107', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+
+        // Gráfico de mantenimientos por mes
+        if (graficos.mantenimientos) graficos.mantenimientos.destroy();
+        const meses = data.mantenimientos_por_mes?.map(m => m.mes) || ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
+        const cantidades = data.mantenimientos_por_mes?.map(m => m.cantidad) || [0, 0, 0, 0, 0, 0];
+
+        graficos.mantenimientos = new Chart(document.getElementById('graficoMantenimientos'), {
+            type: 'bar',
+            data: {
+                labels: meses,
+                datasets: [{
+                    label: 'Mantenimientos',
+                    data: cantidades,
+                    backgroundColor: '#1a3a8a',
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+
+        // Gráfico de componentes con mayor desgaste
+        if (graficos.componentes) graficos.componentes.destroy();
+        const compLabels = data.componentes_desgaste?.map(c => c.nombre) || [];
+        const compData = data.componentes_desgaste?.map(c => c.cantidad) || [];
+
+        graficos.componentes = new Chart(document.getElementById('graficoComponentes'), {
+            type: 'bar',
+            data: {
+                labels: compLabels,
+                datasets: [{
+                    label: 'Componentes en mal estado',
+                    data: compData,
+                    backgroundColor: '#fd7e14',
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, indexAxis: 'y' }
+        });
+
+        // Gráfico de criticidad
+        if (graficos.criticidad) graficos.criticidad.destroy();
+        const critLabels = ['Bajo', 'Medio', 'Alto', 'Crítico'];
+        const critData = [];
+        if (data.vehiculos_por_criticidad) {
+            const critMap = { BAJO: 0, MEDIO: 0, ALTO: 0, CRITICO: 0 };
+            data.vehiculos_por_criticidad.forEach(c => { critMap[c.criticidad] = c.cantidad; });
+            critData.push(critMap.BAJO, critMap.MEDIO, critMap.ALTO, critMap.CRITICO);
+        }
+
+        graficos.criticidad = new Chart(document.getElementById('graficoCriticidad'), {
+            type: 'pie',
+            data: {
+                labels: critLabels,
+                datasets: [{
+                    data: critData,
+                    backgroundColor: ['#198754', '#ffc107', '#fd7e14', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: true }
+        });
+    }
+
+    // Actualizar tabla de alertas
+    function actualizarTablaAlertas(alertas) {
+        const tbody = document.getElementById('tablaAlertas');
+
+        if (!alertas || alertas.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-4">
+                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                        <p class="mb-0">No hay alertas activas</p>
+                        <small class="text-muted">Todos los vehículos están dentro de parámetros normales</small>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = alertas.map(alerta => `
+            <tr class="alerta-item ${alerta.nivel?.toLowerCase()}">
+                <td><strong>${alerta.placa || 'N/A'}</strong></td>
+                <td>
+                    <span class="badge bg-${getNivelColor(alerta.nivel)}">
+                        ${alerta.nivel || 'N/A'}
+                    </span>
+                </td>
+                <td>${alerta.mensaje || 'Sin mensaje'}</td>
+                <td><small>${formatearFecha(alerta.fecha)}</small></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="irAMantenimiento(${alerta.vehiculo_id})">
+                        <i class="fas fa-tools"></i> Atender
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function getNivelColor(nivel) {
+        const colores = { 'CRITICO': 'danger', 'ALTO': 'warning', 'MEDIO': 'info', 'BAJO': 'success' };
+        return colores[nivel] || 'secondary';
+    }
+
+    function formatearFecha(fecha) {
+        if (!fecha) return 'N/A';
+        const date = new Date(fecha);
+        return date.toLocaleDateString('es-ES');
+    }
+
+    function irAMantenimiento(vehiculoId) {
+        window.location.href = `mantenimiento.html?vehiculo_id=${vehiculoId}`;
+    }
+
+    function cerrarSesion() {
+        if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Auto-refresh cada 30 segundos
+    setInterval(() => {
+        cargarDashboard();
+    }, 30000);
+
+    // Inicializar
+    mostrarFecha();
+    cargarDashboard();
+</script>
+
+</body>
+</html>
