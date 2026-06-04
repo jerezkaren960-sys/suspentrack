@@ -110,21 +110,20 @@ async function calcularCriticidad(vehiculoId, connection) {
     return { puntajeTotal, clasificacion };
 }
 
-// ==================== LOGIN ====================
 app.post('/api/login', async (req, res) => {
-    try {
-        const { correo, password } = req.body;
-        const [users] = await pool.query('SELECT id, nombre, correo, password, rol FROM usuarios WHERE correo = ? AND estado = "ACTIVO"', [correo]);
-        if (users.length === 0) return res.status(401).json({ error: 'Credenciales inválidas' });
+    // SIMULADOR: acepta cualquier credencial
+    const { correo, password } = req.body;
 
-        const valido = await bcrypt.compare(password, users[0].password);
-        if (!valido) return res.status(401).json({ error: 'Credenciales inválidas' });
+    const token = jwt.sign(
+        { id: 1, nombre: 'Usuario', rol: 'ADMIN' },
+        JWT_SECRET,
+        { expiresIn: '8h' }
+    );
 
-        const token = jwt.sign({ id: users[0].id, nombre: users[0].nombre, rol: users[0].rol }, JWT_SECRET, { expiresIn: '8h' });
-        res.json({ token, usuario: { id: users[0].id, nombre: users[0].nombre, rol: users[0].rol } });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    res.json({
+        token,
+        usuario: { id: 1, nombre: 'Usuario Simulador', rol: 'ADMIN' }
+    });
 });
 
 // ==================== USUARIOS ====================
