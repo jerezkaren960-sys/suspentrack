@@ -6,566 +6,173 @@
     <title>SuspenTrack - Reportes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        .report-card {
-            border: none;
-            border-radius: 15px;
-            transition: all 0.3s;
-            cursor: pointer;
-            overflow: hidden;
-            height: 100%;
-        }
-        .report-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        .report-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-        .report-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        .report-desc {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        .btn-pdf {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
-        .btn-pdf:hover {
-            background: #b02a37;
-            transform: scale(1.05);
-        }
-        .btn-excel {
-            background: #198754;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
-        .btn-excel:hover {
-            background: #157347;
-            transform: scale(1.05);
-        }
-        .filtros-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .preview-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 25px;
-            border-left: 4px solid #1a3a8a;
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            display: none;
-        }
-        .loading-content {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-        }
+        body { background: #f4f6f9; }
+        .sidebar { min-height: 100vh; background: linear-gradient(180deg, #1a3a8a, #0d1b3e); }
+        .sidebar a { color: white; text-decoration: none; display: block; padding: 12px 20px; transition: 0.3s; border-radius: 8px; margin: 4px 10px; }
+        .sidebar a:hover { background: #c5a059; color: #000; transform: translateX(5px); }
+        .sidebar a.active { background: #c5a059; color: #000; }
+        .sidebar a i { margin-right: 10px; width: 25px; }
+
+        .report-card { border: none; border-radius: 15px; transition: all 0.3s; cursor: pointer; overflow: hidden; height: 100%; }
+        .report-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .report-icon { font-size: 3rem; margin-bottom: 15px; }
+        .report-title { font-weight: 700; margin-bottom: 10px; }
+        .report-desc { font-size: 0.85rem; color: #666; margin-bottom: 15px; }
+        .btn-pdf { background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; transition: all 0.3s; }
+        .btn-pdf:hover { background: #b02a37; transform: scale(1.05); }
+        .btn-excel { background: #198754; color: white; border: none; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; transition: all 0.3s; }
+        .btn-excel:hover { background: #157347; transform: scale(1.05); }
+        .filtros-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .preview-card { background: #f8f9fa; border-radius: 15px; padding: 20px; margin-top: 25px; border-left: 4px solid #1a3a8a; }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; display: none; }
+        .loading-content { background: white; padding: 30px; border-radius: 15px; text-align: center; }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
-            <i class="fas fa-truck me-2"></i>
-            <span>SuspenTrack - Mocha</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
-                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
-                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
-                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
-                <li class="nav-item"><a class="nav-link active" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
-                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
-            </ul>
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="text-center py-4">
+                <i class="fas fa-truck fa-3x text-warning"></i>
+                <h4 class="text-white mt-2">SuspenTrack</h4>
+                <small class="text-white-50">Cantón Mocha</small>
+            </div>
+            <hr class="text-white-50 mx-3">
+            <nav>
+                <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a>
+                <a href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a>
+                <a href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a>
+                <a href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a>
+                <a href="alertas.html"><i class="fas fa-bell"></i> Alertas</a>
+                <a href="reportes.html" class="active"><i class="fas fa-file-pdf"></i> Reportes</a>
+                <a href="usuario.html"><i class="fas fa-users"></i> Usuarios</a>
+                <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+            </nav>
         </div>
-    </div>
-</nav>
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-file-alt text-primary me-2"></i>
-            Generación de Reportes
-        </h2>
-        <div>
-            <button class="btn btn-outline-secondary" onclick="recargarPagina()">
-                <i class="fas fa-sync-alt me-2"></i> Actualizar
-            </button>
-        </div>
-    </div>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-file-alt text-primary me-2"></i>Generación de Reportes</h2>
+                <button class="btn btn-outline-secondary" onclick="recargarPagina()"><i class="fas fa-sync-alt me-2"></i> Actualizar</button>
+            </div>
 
-    <!-- Filtros comunes -->
-    <div class="filtros-card">
-        <h5 class="mb-3">
-            <i class="fas fa-filter me-2"></i>
-            Filtros Comunes
-        </h5>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Fecha Desde</label>
-                <input type="date" id="fecha_desde" class="form-control">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Fecha Hasta</label>
-                <input type="date" id="fecha_hasta" class="form-control">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold">Vehículo (opcional)</label>
-                <select id="vehiculo_id" class="form-select">
-                    <option value="">Todos los vehículos</option>
-                </select>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-12 text-end">
-                <button class="btn btn-secondary" onclick="limpiarFiltros()">
-                    <i class="fas fa-eraser me-2"></i> Limpiar filtros
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grid de reportes -->
-    <div class="row g-4">
-        <!-- Reporte 1: Historial de Mantenimiento -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-primary">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h5 class="report-title">Historial de Mantenimiento</h5>
-                    <p class="report-desc">Historial completo de mantenimientos preventivos y correctivos por vehículo</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('mantenimiento', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('mantenimiento', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
+            <!-- Filtros comunes -->
+            <div class="filtros-card">
+                <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filtros Comunes</h5>
+                <div class="row g-3">
+                    <div class="col-md-4"><label class="form-label fw-bold">Fecha Desde</label><input type="date" id="fecha_desde" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Fecha Hasta</label><input type="date" id="fecha_hasta" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Vehículo</label><select id="vehiculo_id" class="form-select"><option value="">Todos los vehículos</option></select></div>
                 </div>
+                <div class="row mt-3"><div class="col-12 text-end"><button class="btn btn-secondary btn-sm" onclick="limpiarFiltros()"><i class="fas fa-eraser me-2"></i> Limpiar filtros</button></div></div>
             </div>
-        </div>
 
-        <!-- Reporte 2: Vehículos Críticos -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-danger">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <h5 class="report-title">Vehículos Críticos</h5>
-                    <p class="report-desc">Vehículos clasificados como CRÍTICO o ALTO según algoritmo de priorización</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('criticos', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('criticos', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
-                </div>
+            <!-- Grid de reportes -->
+            <div class="row g-4">
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-primary"><i class="fas fa-history"></i></div><h5 class="report-title">Historial de Mantenimiento</h5><p class="report-desc">Historial completo de mantenimientos</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('mantenimiento', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('mantenimiento', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-danger"><i class="fas fa-exclamation-triangle"></i></div><h5 class="report-title">Vehículos Críticos</h5><p class="report-desc">Vehículos con criticidad CRÍTICO o ALTO</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('criticos', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('criticos', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-warning"><i class="fas fa-dollar-sign"></i></div><h5 class="report-title">Costos de Mantenimiento</h5><p class="report-desc">Costos acumulados por período</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('costos', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('costos', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-info"><i class="fas fa-cogs"></i></div><h5 class="report-title">Componentes más Reemplazados</h5><p class="report-desc">Top de componentes con más desgaste</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('componentes', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('componentes', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-success"><i class="fas fa-chart-line"></i></div><h5 class="report-title">Frecuencia de Fallas</h5><p class="report-desc">Análisis de fallas por componente</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('fallas', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('fallas', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
+                <div class="col-md-4"><div class="card report-card"><div class="card-body text-center"><div class="report-icon text-dark"><i class="fas fa-flag-checkered"></i></div><h5 class="report-title">Estado General de la Flota</h5><p class="report-desc">Resumen ejecutivo de toda la flota</p><div class="d-flex justify-content-center gap-2"><button class="btn-pdf" onclick="generarReporte('flota', 'pdf')"><i class="fas fa-file-pdf me-1"></i> PDF</button><button class="btn-excel" onclick="generarReporte('flota', 'excel')"><i class="fas fa-file-excel me-1"></i> Excel</button></div></div></div></div>
             </div>
-        </div>
 
-        <!-- Reporte 3: Costos de Mantenimiento -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-warning">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <h5 class="report-title">Costos de Mantenimiento</h5>
-                    <p class="report-desc">Costos acumulados por vehículo, tipo de mantenimiento y período</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('costos', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('costos', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
-                </div>
+            <!-- Vista previa -->
+            <div class="preview-card" id="previewCard" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0"><i class="fas fa-eye me-2"></i>Vista Previa</h5><button class="btn-close" onclick="cerrarPreview()"></button></div>
+                <div id="previewContent"></div>
             </div>
-        </div>
-
-        <!-- Reporte 4: Componentes más reemplazados -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-info">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h5 class="report-title">Componentes más Reemplazados</h5>
-                    <p class="report-desc">Top de componentes con mayor frecuencia de reemplazo y desgaste</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('componentes', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('componentes', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reporte 5: Frecuencia de Fallas -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-success">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h5 class="report-title">Frecuencia de Fallas</h5>
-                    <p class="report-desc">Análisis de fallas por componente, vehículo y período de tiempo</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('fallas', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('fallas', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reporte 6: Estado General de la Flota -->
-        <div class="col-md-4">
-            <div class="card report-card">
-                <div class="card-body text-center">
-                    <div class="report-icon text-dark">
-                        <i class="fas fa-flag-checkered"></i>
-                    </div>
-                    <h5 class="report-title">Estado General de la Flota</h5>
-                    <p class="report-desc">Resumen ejecutivo de toda la flota: críticos, operativos, costos totales</p>
-                    <div class="d-flex justify-content-center gap-2">
-                        <button class="btn-pdf" onclick="generarReporte('flota', 'pdf')">
-                            <i class="fas fa-file-pdf me-1"></i> PDF
-                        </button>
-                        <button class="btn-excel" onclick="generarReporte('flota', 'excel')">
-                            <i class="fas fa-file-excel me-1"></i> Excel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Vista previa del reporte -->
-    <div class="preview-card" id="previewCard" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">
-                <i class="fas fa-eye me-2"></i>
-                Vista Previa del Reporte
-            </h5>
-            <button class="btn-close" onclick="cerrarPreview()"></button>
-        </div>
-        <div id="previewContent">
-            <!-- Contenido de vista previa -->
         </div>
     </div>
 </div>
 
 <!-- Loading overlay -->
-<div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-content">
-        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Cargando...</span>
-        </div>
-        <h5>Generando reporte...</h5>
-        <p class="text-muted mb-0">Por favor espere</p>
-    </div>
-</div>
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-content"><div class="spinner-border text-primary mb-3" style="width:3rem;height:3rem;"></div><h5>Generando reporte...</h5><p class="text-muted">Por favor espere</p></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-        window.location.href = 'index.html';
-    }
-
-    // Configurar fechas por defecto (últimos 30 días)
     const hoy = new Date();
     const hace30Dias = new Date();
     hace30Dias.setDate(hoy.getDate() - 30);
-
     document.getElementById('fecha_hasta').valueAsDate = hoy;
     document.getElementById('fecha_desde').valueAsDate = hace30Dias;
 
-    // Cargar vehículos para el filtro
     async function cargarVehiculos() {
         try {
-            const response = await fetch('/api/vehicles', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch('/api/vehicles');
             const vehiculos = await response.json();
             const select = document.getElementById('vehiculo_id');
-            select.innerHTML = '<option value="">Todos los vehículos</option>' +
-                vehiculos.map(v => `<option value="${v.id}">${v.placa} - ${v.marca} ${v.modelo}</option>`).join('');
-        } catch (error) {
-            console.error('Error al cargar vehículos:', error);
-        }
+            select.innerHTML = '<option value="">Todos los vehículos</option>' + vehiculos.map(v => `<option value="${v.id}">${v.placa} - ${v.marca} ${v.modelo}</option>`).join('');
+        } catch (error) { console.error(error); }
     }
 
-    // Generar reporte
     async function generarReporte(tipo, formato) {
         const fecha_desde = document.getElementById('fecha_desde').value;
         const fecha_hasta = document.getElementById('fecha_hasta').value;
         const vehiculo_id = document.getElementById('vehiculo_id').value;
 
-        // Mostrar loading
         const loading = document.getElementById('loadingOverlay');
         loading.style.display = 'flex';
 
-        // Construir URL con parámetros
         let url = `/api/reports/generate?tipo=${tipo}&formato=${formato}`;
         if (fecha_desde) url += `&fecha_desde=${fecha_desde}`;
         if (fecha_hasta) url += `&fecha_hasta=${fecha_hasta}`;
         if (vehiculo_id) url += `&vehiculo_id=${vehiculo_id}`;
 
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al generar reporte');
-            }
-
-            // Obtener el blob y descargar
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Error al generar');
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = downloadUrl;
-            const extension = formato === 'pdf' ? 'pdf' : 'xlsx';
-            a.download = `reporte_${tipo}_${new Date().toISOString().slice(0, 19)}.${extension}`;
-            document.body.appendChild(a);
+            a.download = `reporte_${tipo}_${new Date().toISOString().slice(0,19)}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`;
             a.click();
             a.remove();
             window.URL.revokeObjectURL(downloadUrl);
-
-            // Mostrar mensaje de éxito
-            mostrarMensaje(`✅ Reporte generado exitosamente`, 'success');
-
-            // Mostrar vista previa
+            alert('✅ Reporte generado');
             await mostrarPreview(tipo);
-
         } catch (error) {
-            console.error('Error:', error);
-            mostrarMensaje(`❌ Error al generar el reporte: ${error.message}`, 'danger');
+            alert('❌ Error al generar reporte');
         } finally {
             loading.style.display = 'none';
         }
     }
 
-    // Mostrar vista previa
     async function mostrarPreview(tipo) {
         const previewCard = document.getElementById('previewCard');
         const previewContent = document.getElementById('previewContent');
-
         previewCard.style.display = 'block';
 
-        // Obtener datos para vista previa
-        const fecha_desde = document.getElementById('fecha_desde').value;
-        const fecha_hasta = document.getElementById('fecha_hasta').value;
-        const vehiculo_id = document.getElementById('vehiculo_id').value;
-
-        let data = null;
-
         try {
-            switch(tipo) {
-                case 'mantenimiento':
-                    const respMant = await fetch('/api/maintenances', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    data = await respMant.json();
-                    previewContent.innerHTML = `
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead class="table-light">
-                                    <tr><th>Fecha</th><th>Vehículo</th><th>Tipo</th><th>Costo</th></tr>
-                                </thead>
-                                <tbody>
-                                    ${data.slice(0, 5).map(m => `
-                                        <tr>
-                                            <td>${formatearFecha(m.fecha)}</td>
-                                            <td>${m.placa}</td>
-                                            <td>${m.tipo}</td>
-                                            <td>$${m.costo}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                            ${data.length > 5 ? `<p class="text-muted mt-2">Mostrando 5 de ${data.length} registros</p>` : ''}
-                        </div>
-                    `;
-                    break;
-
-                case 'criticos':
-                    const respVehiculos = await fetch('/api/vehicles', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const vehiculos = await respVehiculos.json();
-                    const criticos = vehiculos.filter(v => v.criticidad === 'CRITICO' || v.criticidad === 'ALTO');
-                    previewContent.innerHTML = `
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead class="table-light">
-                                    <tr><th>Placa</th><th>Vehículo</th><th>Criticidad</th><th>Estado</th></tr>
-                                </thead>
-                                <tbody>
-                                    ${criticos.slice(0, 5).map(v => `
-                                        <tr class="${v.criticidad === 'CRITICO' ? 'table-danger' : 'table-warning'}">
-                                            <td>${v.placa}</td>
-                                            <td>${v.marca} ${v.modelo}</td>
-                                            <td><span class="badge bg-${v.criticidad === 'CRITICO' ? 'danger' : 'warning'}">${v.criticidad}</span></td>
-                                            <td>${v.estado_general}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                            ${criticos.length > 5 ? `<p class="text-muted mt-2">Mostrando 5 de ${criticos.length} vehículos críticos</p>` : ''}
-                        </div>
-                    `;
-                    break;
-
-                case 'costos':
-                    const respCostos = await fetch('/api/maintenances', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    const mantenimientos = await respCostos.json();
-                    const totalCostos = mantenimientos.reduce((sum, m) => sum + (m.costo || 0), 0);
-                    previewContent.innerHTML = `
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="alert alert-success text-center">
-                                    <h4>$${totalCostos.toLocaleString()}</h4>
-                                    <p class="mb-0">Costo total acumulado</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="alert alert-info text-center">
-                                    <h4>${mantenimientos.length}</h4>
-                                    <p class="mb-0">Total mantenimientos</p>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-muted mt-2">El reporte completo incluirá desglose por vehículo y tipo de mantenimiento.</p>
-                    `;
-                    break;
-
-                default:
-                    previewContent.innerHTML = `
-                        <div class="text-center py-3">
-                            <i class="fas fa-chart-line fa-3x text-primary mb-2"></i>
-                            <p>El reporte contiene información detallada sobre ${tipo}.</p>
-                            <p class="text-muted small">Descargue el archivo para ver el contenido completo.</p>
-                        </div>
-                    `;
+            if (tipo === 'mantenimiento') {
+                const resp = await fetch('/api/maintenances');
+                const data = await resp.json();
+                previewContent.innerHTML = `<div class="table-responsive"><table class="table table-sm"><thead class="table-light"><tr><th>Fecha</th><th>Vehículo</th><th>Tipo</th><th>Costo</th></tr></thead><tbody>${data.slice(0,5).map(m => `<tr><td>${new Date(m.fecha).toLocaleDateString()}</td><td>${m.placa}</td><td>${m.tipo}</td><td>$${m.costo}</td>`).join('')}</tbody></table>${data.length > 5 ? `<p class="text-muted">Mostrando 5 de ${data.length}</p>` : ''}</div>`;
+            } else if (tipo === 'criticos') {
+                const resp = await fetch('/api/vehicles');
+                const vehiculos = await resp.json();
+                const criticos = vehiculos.filter(v => v.criticidad === 'CRITICO' || v.criticidad === 'ALTO');
+                previewContent.innerHTML = `<div class="table-responsive"><table class="table table-sm"><thead class="table-light"><tr><th>Placa</th><th>Vehículo</th><th>Criticidad</th><th>Estado</th></tr></thead><tbody>${criticos.slice(0,5).map(v => `<tr><td>${v.placa}</td><td>${v.marca} ${v.modelo}</td><td><span class="badge bg-${v.criticidad === 'CRITICO' ? 'danger' : 'warning'}">${v.criticidad}</span></td><td>${v.estado_general}</td>`).join('')}</tbody></table>${criticos.length > 5 ? `<p class="text-muted">Mostrando 5 de ${criticos.length}</p>` : ''}</div>`;
+            } else {
+                previewContent.innerHTML = `<div class="text-center py-3"><i class="fas fa-chart-line fa-3x text-primary mb-2"></i><p>Reporte de ${tipo}</p><p class="text-muted">Descargue el archivo para ver el contenido completo</p></div>`;
             }
         } catch (error) {
-            previewContent.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Vista previa no disponible. Descargue el reporte para ver el contenido completo.
-                </div>
-            `;
+            previewContent.innerHTML = `<div class="alert alert-warning">Vista previa no disponible. Descargue el reporte.</div>`;
         }
     }
 
-    function cerrarPreview() {
-        document.getElementById('previewCard').style.display = 'none';
-    }
+    function cerrarPreview() { document.getElementById('previewCard').style.display = 'none'; }
+    function limpiarFiltros() { document.getElementById('fecha_desde').value = ''; document.getElementById('fecha_hasta').value = ''; document.getElementById('vehiculo_id').value = ''; alert('✅ Filtros limpiados'); }
+    function recargarPagina() { location.reload(); }
 
-    function formatearFecha(fecha) {
-        if (!fecha) return 'N/A';
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES');
-    }
-
-    function limpiarFiltros() {
-        document.getElementById('fecha_desde').value = '';
-        document.getElementById('fecha_hasta').value = '';
-        document.getElementById('vehiculo_id').value = '';
-        mostrarMensaje('✅ Filtros limpiados', 'info');
-    }
-
-    function recargarPagina() {
-        location.reload();
-    }
-
-    function mostrarMensaje(mensaje, tipo) {
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
-        alertDiv.style.zIndex = '9999';
-        alertDiv.innerHTML = `
-            ${mensaje}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        document.body.appendChild(alertDiv);
-        setTimeout(() => alertDiv.remove(), 3000);
-    }
-
-    function cerrarSesion() {
-        if (confirm('¿Está seguro que desea cerrar sesión?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
-        }
-    }
-
-    // Inicializar
     cargarVehiculos();
 </script>
-
 </body>
 </html>

@@ -3,254 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuspenTrack - Inspecciones de Suspensión</title>
+    <title>SuspenTrack - Inspecciones</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        .form-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-        .form-header {
-            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
-            color: white;
-            padding: 20px;
-        }
-        .componente-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 15px;
-            transition: all 0.3s;
-            background: #fafafa;
-        }
-        .componente-card:hover {
-            border-color: #c5a059;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        .componente-nombre {
-            font-weight: 600;
-            color: #1a3a8a;
-            margin-bottom: 10px;
-        }
-        .estado-select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        .evidencia-preview {
-            max-width: 150px;
-            max-height: 100px;
-            margin: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .evidencia-preview:hover {
-            transform: scale(1.05);
-        }
-        .badge-estado {
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
+        body { background: #f4f6f9; }
+        .sidebar { min-height: 100vh; background: linear-gradient(180deg, #1a3a8a, #0d1b3e); }
+        .sidebar a { color: white; text-decoration: none; display: block; padding: 12px 20px; transition: 0.3s; border-radius: 8px; margin: 4px 10px; }
+        .sidebar a:hover { background: #c5a059; color: #000; transform: translateX(5px); }
+        .sidebar a.active { background: #c5a059; color: #000; }
+        .sidebar a i { margin-right: 10px; width: 25px; }
+
+        .form-container { background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; }
+        .form-header { background: linear-gradient(135deg, #1a3a8a, #0d1b3e); color: white; padding: 20px; }
+        .componente-card { border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; transition: all 0.3s; background: #fafafa; }
+        .componente-card:hover { border-color: #c5a059; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .componente-nombre { font-weight: 600; color: #1a3a8a; margin-bottom: 10px; }
+        .estado-select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ddd; }
+        .badge-estado { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .estado-excelente { background: #198754; color: white; }
         .estado-bueno { background: #0dcaf0; color: #000; }
         .estado-regular { background: #ffc107; color: #000; }
         .estado-malo { background: #fd7e14; color: white; }
         .estado-critico { background: #dc3545; color: white; }
-
-        .foto-subida {
-            position: relative;
-            display: inline-block;
-        }
-        .foto-subida .remove-foto {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            cursor: pointer;
-        }
+        .filtro-bar { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .refresh-btn { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #1a3a8a; color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: all 0.3s; z-index: 1000; cursor: pointer; }
+        .refresh-btn:hover { transform: rotate(180deg); background: #c5a059; }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
-            <i class="fas fa-truck me-2"></i>
-            <span>SuspenTrack - Mocha</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
-                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
-                <li class="nav-item"><a class="nav-link active" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
-                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
-                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
-                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-clipboard-list text-primary me-2"></i>
-            Inspecciones de Suspensión
-        </h2>
-        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formInspeccionCollapse">
-            <i class="fas fa-plus me-2"></i> Nueva Inspección
-        </button>
-    </div>
-
-    <!-- Formulario de inspección (colapsable) -->
-    <div class="collapse" id="formInspeccionCollapse">
-        <div class="form-container">
-            <div class="form-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-clipboard-list me-2"></i>
-                    Registrar Nueva Inspección
-                </h5>
-                <small>Complete todos los campos para registrar una inspección técnica</small>
+<div class="container-fluid">
+    <div class="row">
+        <!-- SIDEBAR -->
+        <div class="col-md-2 sidebar p-0">
+            <div class="text-center py-4">
+                <i class="fas fa-truck fa-3x text-warning"></i>
+                <h4 class="text-white mt-2">SuspenTrack</h4>
+                <small class="text-white-50">Cantón Mocha</small>
             </div>
-            <div class="p-4">
-                <form id="formInspeccion">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label required">Vehículo</label>
-                            <select id="vehiculo_id" class="form-select" required>
-                                <option value="">Seleccionar vehículo...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label required">Técnico Responsable</label>
-                            <select id="tecnico_id" class="form-select" required>
-                                <option value="">Seleccionar técnico...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label required">Fecha de Inspección</label>
-                            <input type="date" id="fecha" class="form-control" required>
-                        </div>
-                    </div>
+            <hr class="text-white-50 mx-3">
+            <nav>
+                <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a>
+                <a href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a>
+                <a href="inspecciones.html" class="active"><i class="fas fa-search"></i> Inspecciones</a>
+                <a href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a>
+                <a href="alertas.html"><i class="fas fa-bell"></i> Alertas</a>
+                <a href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a>
+                <a href="usuario.html"><i class="fas fa-users"></i> Usuarios</a>
+                <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+            </nav>
+        </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label required">Kilometraje Actual</label>
-                            <input type="number" id="kilometraje" class="form-control" placeholder="0" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Evidencias Fotográficas</label>
-                            <input type="file" id="evidencias" class="form-control" accept="image/*" multiple>
-                            <small class="text-muted">Puede seleccionar múltiples fotos del estado de los componentes</small>
-                        </div>
-                    </div>
-
-                    <!-- Componentes de suspensión -->
-                    <h5 class="mt-3 mb-3">
-                        <i class="fas fa-cogs me-2"></i>
-                        Estado de Componentes
-                    </h5>
-                    <div class="row" id="componentesContainer">
-                        <!-- Se llena dinámicamente con JS -->
-                    </div>
-
-                    <div class="mb-3 mt-3">
-                        <label class="form-label">Observaciones Técnicas</label>
-                        <textarea id="observaciones" class="form-control" rows="3" placeholder="Describa hallazgos, recomendaciones, componentes críticos..."></textarea>
-                    </div>
-
-                    <div class="text-end">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#formInspeccionCollapse">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary ms-2">
-                            <i class="fas fa-save me-2"></i> Guardar Inspección
-                        </button>
-                    </div>
-                </form>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-clipboard-list text-primary me-2"></i>Inspecciones de Suspensión</h2>
+                <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formInspeccionCollapse"><i class="fas fa-plus me-2"></i> Nueva Inspección</button>
             </div>
-        </div>
-    </div>
 
-    <!-- Historial de inspecciones -->
-    <div class="card mt-4">
-        <div class="card-header bg-white">
-            <h5 class="mb-0">
-                <i class="fas fa-history me-2"></i>
-                Historial de Inspecciones
-            </h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Vehículo</th>
-                        <th>Técnico</th>
-                        <th>Kilometraje</th>
-                        <th>Componentes Críticos</th>
-                        <th>Evidencias</th>
-                        <th>Acciones</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tablaInspecciones">
-                    <tr>
-                        <td colspan="7" class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
+            <!-- Formulario de inspección (colapsable) -->
+            <div class="collapse" id="formInspeccionCollapse">
+                <div class="form-container">
+                    <div class="form-header"><h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>Registrar Nueva Inspección</h5><small>Complete todos los campos</small></div>
+                    <div class="p-4">
+                        <form id="formInspeccion">
+                            <div class="row">
+                                <div class="col-md-4 mb-3"><label class="form-label required">Vehículo</label><select id="vehiculo_id" class="form-select" required><option value="">Seleccionar vehículo...</option></select></div>
+                                <div class="col-md-4 mb-3"><label class="form-label required">Técnico</label><select id="tecnico_id" class="form-select" required><option value="">Seleccionar técnico...</option></select></div>
+                                <div class="col-md-4 mb-3"><label class="form-label required">Fecha</label><input type="date" id="fecha" class="form-control" required></div>
                             </div>
-                            <p class="mt-2 text-muted">Cargando historial de inspecciones...</p>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="form-label required">Kilometraje</label><input type="number" id="kilometraje" class="form-control" placeholder="0" required></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">Evidencias</label><input type="file" id="evidencias" class="form-control" accept="image/*" multiple></div>
+                            </div>
+                            <h5 class="mt-3 mb-3"><i class="fas fa-cogs me-2"></i>Estado de Componentes</h5>
+                            <div class="row" id="componentesContainer"></div>
+                            <div class="mb-3 mt-3"><label class="form-label">Observaciones</label><textarea id="observaciones" class="form-control" rows="3" placeholder="Describa hallazgos..."></textarea></div>
+                            <div class="text-end"><button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#formInspeccionCollapse">Cancelar</button><button type="submit" class="btn btn-primary ms-2"><i class="fas fa-save me-2"></i> Guardar</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de inspecciones -->
+            <div class="card mt-4">
+                <div class="card-header bg-white"><h5 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Inspecciones</h5></div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light"><tr><th>Fecha</th><th>Vehículo</th><th>Técnico</th><th>Kilometraje</th><th>Observaciones</th><th>Acciones</th></tr></thead>
+                            <tbody id="tablaInspecciones"><tr><td colspan="6" class="text-center py-4"><div class="spinner-border text-primary"></div><p>Cargando...</p></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal para ver detalles de inspección -->
+<!-- Botón flotante -->
+<button class="refresh-btn" onclick="recargarInspecciones()"><i class="fas fa-sync-alt"></i></button>
+
+<!-- Modal detalle -->
 <div class="modal fade" id="modalDetalle" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-clipboard-list me-2"></i>
-                    Detalle de Inspección
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="modalDetalleBody">
-                <!-- Contenido dinámico -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
+            <div class="modal-header bg-primary text-white"><h5 class="modal-title"><i class="fas fa-clipboard-list me-2"></i>Detalle de Inspección</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body" id="modalDetalleBody"></div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
         </div>
     </div>
 </div>
@@ -258,276 +120,119 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const token = localStorage.getItem('token');
     let vehiculosData = [];
     let tecnicosData = [];
-    let fotosSeleccionadas = [];
 
-    // Verificar autenticación
-    if (!token) {
-        window.location.href = 'index.html';
-    }
-
-    // Configurar fecha por defecto
     document.getElementById('fecha').valueAsDate = new Date();
 
-    // Cargar vehículos
     async function cargarVehiculos() {
         try {
-            const response = await fetch('/api/vehicles', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch('/api/vehicles');
             vehiculosData = await response.json();
-
             const select = document.getElementById('vehiculo_id');
-            select.innerHTML = '<option value="">Seleccionar vehículo...</option>' +
-                vehiculosData.map(v => `<option value="${v.id}">${v.placa} - ${v.marca} ${v.modelo} (${v.kilometraje?.toLocaleString() || 0} km) - Criticidad: ${v.criticidad || 'N/A'}</option>`).join('');
-        } catch (error) {
-            console.error('Error al cargar vehículos:', error);
-        }
+            select.innerHTML = '<option value="">Seleccionar vehículo...</option>' + vehiculosData.map(v => `<option value="${v.id}">${v.placa} - ${v.marca} ${v.modelo}</option>`).join('');
+        } catch (error) { console.error(error); }
     }
 
-    // Cargar técnicos
     async function cargarTecnicos() {
         try {
-            const response = await fetch('/api/users', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch('/api/users');
             const users = await response.json();
             tecnicosData = users.filter(u => u.rol === 'TECNICO' || u.rol === 'ADMIN');
-
             const select = document.getElementById('tecnico_id');
-            select.innerHTML = '<option value="">Seleccionar técnico...</option>' +
-                tecnicosData.map(t => `<option value="${t.id}">${t.nombre} (${t.rol})</option>`).join('');
-        } catch (error) {
-            console.error('Error al cargar técnicos:', error);
-        }
+            select.innerHTML = '<option value="">Seleccionar técnico...</option>' + tecnicosData.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+        } catch (error) { console.error(error); }
     }
 
-    // Cargar componentes para evaluación
     function cargarComponentesEvaluacion() {
         const container = document.getElementById('componentesContainer');
-        const componentes = [
-            { nombre: 'AMORTIGUADOR', icono: 'fa-shock-absorber' },
-            { nombre: 'RESORTE', icono: 'fa-spring' },
-            { nombre: 'ROTULA', icono: 'fa-cogs' },
-            { nombre: 'BUJE', icono: 'fa-circle' },
-            { nombre: 'BRAZO_SUSPENSION', icono: 'fa-hand-peace' },
-            { nombre: 'BARRA_ESTABILIZADORA', icono: 'fa-chart-line' }
-        ];
+        const componentes = ['AMORTIGUADOR', 'RESORTE', 'ROTULA', 'BUJE', 'BRAZO_SUSPENSION', 'BARRA_ESTABILIZADORA'];
         const estados = ['EXCELENTE', 'BUENO', 'REGULAR', 'MALO', 'CRITICO'];
-
         container.innerHTML = componentes.map(comp => `
             <div class="col-md-4 mb-3">
                 <div class="componente-card">
-                    <div class="componente-nombre">
-                        <i class="fas ${comp.icono} me-2"></i>
-                        ${comp.nombre.replace('_', ' ')}
-                    </div>
-                    <select class="estado-select" data-componente="${comp.nombre}">
-                        ${estados.map(e => `<option value="${e}">${e}</option>`).join('')}
-                    </select>
+                    <div class="componente-nombre"><i class="fas fa-cog me-2"></i>${comp.replace('_', ' ')}</div>
+                    <select class="estado-select" data-componente="${comp}">${estados.map(e => `<option value="${e}">${e}</option>`).join('')}</select>
                 </div>
             </div>
         `).join('');
     }
 
-    // Cargar historial de inspecciones
     async function cargarHistorial() {
         try {
-            const response = await fetch('/api/inspections', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) throw new Error('Error al cargar inspecciones');
-
+            const response = await fetch('/api/inspections');
             const inspecciones = await response.json();
-            mostrarTablaHistorial(inspecciones);
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('tablaInspecciones').innerHTML = `
-                <tr><td colspan="7" class="text-center text-danger py-4">
-                    <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
-                    <p>Error al cargar el historial de inspecciones</p>
-                </td></tr>
-            `;
-        }
+            const tbody = document.getElementById('tablaInspecciones');
+            if (inspecciones.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay inspecciones registradas</td></tr>';
+                return;
+            }
+            tbody.innerHTML = inspecciones.map(ins => `
+                <tr>
+                    <td>${new Date(ins.fecha).toLocaleDateString()}</td>
+                    <td><strong>${ins.placa}</strong></td>
+                    <td>${ins.tecnico_nombre || ins.tecnico_id}</td>
+                    <td>${ins.kilometraje?.toLocaleString() || 0} km</td>
+                    <td>${ins.observaciones ? (ins.observaciones.length > 50 ? ins.observaciones.substring(0,50)+'...' : ins.observaciones) : '-'}</td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="verDetalle(${ins.id})"><i class="fas fa-eye"></i></button></td>
+                </tr>
+            `).join('');
+        } catch (error) { console.error(error); }
     }
 
-    // Mostrar tabla de historial
-    function mostrarTablaHistorial(inspecciones) {
-        const tbody = document.getElementById('tablaInspecciones');
-
-        if (inspecciones.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="7" class="text-center py-4">
-                    <i class="fas fa-clipboard-list fa-2x text-muted mb-2"></i>
-                    <p class="mb-0">No hay inspecciones registradas</p>
-                    <small class="text-muted">Realice una nueva inspección para comenzar</small>
-                </td></tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = inspecciones.map(ins => `
-            <tr>
-                <td><strong>${formatearFecha(ins.fecha)}</strong></td>
-                <td>${ins.placa || 'N/A'}<br><small class="text-muted">${ins.marca || ''} ${ins.modelo || ''}</small></td>
-                <td>${ins.tecnico_nombre || 'N/A'}</td>
-                <td>${ins.kilometraje?.toLocaleString() || 0} km</td>
-                <td>${ins.componentes_criticos || '-'}</td>
-                <td>
-                    ${ins.evidencia ? `<i class="fas fa-image text-primary me-1"></i> <small>${ins.evidencia}</small>` : '<span class="text-muted">Sin evidencias</span>'}
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="verDetalle(${ins.id})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    // Guardar inspección
     document.getElementById('formInspeccion').addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        const btnSubmit = document.querySelector('#formInspeccion button[type="submit"]');
-        const originalText = btnSubmit.innerHTML;
-        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
-        btnSubmit.disabled = true;
-
-        // Recopilar datos
         const vehiculo_id = document.getElementById('vehiculo_id').value;
         const tecnico_id = document.getElementById('tecnico_id').value;
         const fecha = document.getElementById('fecha').value;
         const kilometraje = document.getElementById('kilometraje').value;
         const observaciones = document.getElementById('observaciones').value;
+        if (!vehiculo_id || !tecnico_id || !fecha || !kilometraje) { alert('Complete los campos requeridos'); return; }
 
-        if (!vehiculo_id || !tecnico_id || !fecha || !kilometraje) {
-            alert('❌ Por favor complete todos los campos requeridos');
-            btnSubmit.innerHTML = originalText;
-            btnSubmit.disabled = false;
-            return;
-        }
-
-        // Recopilar estados de componentes
         const componentes = [];
         document.querySelectorAll('#componentesContainer select').forEach(select => {
-            componentes.push({
-                nombre: select.dataset.componente,
-                estado: select.value
-            });
+            componentes.push({ nombre: select.dataset.componente, estado: select.value });
         });
 
-        const data = {
-            vehiculo_id: parseInt(vehiculo_id),
-            tecnico_id: parseInt(tecnico_id),
-            fecha: fecha,
-            kilometraje: parseInt(kilometraje),
-            observaciones: observaciones,
-            componentes: componentes
-        };
+        const data = { vehiculo_id, tecnico_id, fecha, kilometraje, observaciones, componentes };
+        const btnSubmit = document.querySelector('#formInspeccion button[type="submit"]');
+        const originalText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
+        btnSubmit.disabled = true;
 
         try {
-            const response = await fetch('/api/inspections', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
+            const response = await fetch('/api/inspections', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             if (response.ok) {
-                alert('✅ Inspección registrada exitosamente');
-                // Recalcular criticidad del vehículo
-                await fetch(`/api/vehicles/${vehiculo_id}/recalculate`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                // Cerrar formulario y recargar
+                alert('Inspección registrada');
                 document.getElementById('formInspeccionCollapse').classList.remove('show');
                 document.getElementById('formInspeccion').reset();
                 document.getElementById('fecha').valueAsDate = new Date();
                 cargarHistorial();
-            } else {
-                alert('❌ Error: ' + (result.error || 'No se pudo registrar la inspección'));
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('❌ Error de conexión. Verifique que el servidor esté corriendo.');
-        } finally {
-            btnSubmit.innerHTML = originalText;
-            btnSubmit.disabled = false;
-        }
+            } else alert('Error al guardar');
+        } catch (error) { alert('Error de conexión'); }
+        finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
     });
 
-    // Ver detalle de inspección
     async function verDetalle(id) {
         try {
-            const response = await fetch(`/api/inspections/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            const inspeccion = await response.json();
-
-            const modalBody = document.getElementById('modalDetalleBody');
-            modalBody.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong><i class="fas fa-truck me-2"></i>Vehículo:</strong> ${inspeccion.placa}</p>
-                        <p><strong><i class="fas fa-user me-2"></i>Técnico:</strong> ${inspeccion.tecnico_nombre}</p>
-                        <p><strong><i class="fas fa-calendar me-2"></i>Fecha:</strong> ${formatearFecha(inspeccion.fecha)}</p>
-                        <p><strong><i class="fas fa-road me-2"></i>Kilometraje:</strong> ${inspeccion.kilometraje?.toLocaleString()} km</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong><i class="fas fa-cogs me-2"></i>Componentes evaluados:</strong> 6</p>
-                        <p><strong><i class="fas fa-comment me-2"></i>Observaciones:</strong></p>
-                        <p class="p-2 bg-light rounded">${inspeccion.observaciones || 'Sin observaciones'}</p>
-                    </div>
-                </div>
-                <hr>
-                <h6>Estado de Componentes:</h6>
-                <div class="row">
-                    ${inspeccion.componentes ? inspeccion.componentes.map(comp => `
-                        <div class="col-md-4 mb-2">
-                            <span class="badge-estado estado-${comp.estado?.toLowerCase()}">${comp.nombre}: ${comp.estado}</span>
-                        </div>
-                    `).join('') : '<p>No se registraron componentes</p>'}
-                </div>
+            const response = await fetch(`/api/inspections/${id}`);
+            const ins = await response.json();
+            document.getElementById('modalDetalleBody').innerHTML = `
+                <p><strong>Vehículo:</strong> ${ins.placa}</p><p><strong>Fecha:</strong> ${new Date(ins.fecha).toLocaleDateString()}</p>
+                <p><strong>Kilometraje:</strong> ${ins.kilometraje?.toLocaleString()} km</p>
+                <p><strong>Observaciones:</strong> ${ins.observaciones || 'Sin observaciones'}</p>
             `;
-
             const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
             modal.show();
-        } catch (error) {
-            alert('Error al cargar el detalle');
-        }
+        } catch (error) { alert('Error al cargar detalle'); }
     }
 
-    function formatearFecha(fecha) {
-        if (!fecha) return 'N/A';
-        const date = new Date(fecha);
-        return date.toLocaleDateString('es-ES');
-    }
+    function recargarInspecciones() { cargarHistorial(); }
 
-    function cerrarSesion() {
-        if (confirm('¿Está seguro que desea cerrar sesión?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
-        }
-    }
-
-    // Inicializar
     cargarVehiculos();
     cargarTecnicos();
     cargarComponentesEvaluacion();
     cargarHistorial();
 </script>
-
 </body>
 </html>

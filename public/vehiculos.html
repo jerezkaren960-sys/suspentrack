@@ -6,412 +6,132 @@
     <title>SuspenTrack - Vehículos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        .vehicle-card {
-            border: none;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            overflow: hidden;
-        }
-        .vehicle-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        .vehicle-header {
-            background: linear-gradient(135deg, #1a3a8a, #0d1b3e);
-            color: white;
-            padding: 15px;
-            position: relative;
-        }
-        .vehicle-placa {
-            font-size: 1.3rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .vehicle-body {
-            padding: 15px;
-        }
-        .criticidad-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .critico-bg { background: #dc3545; color: white; animation: pulse 1.5s infinite; }
-        .alto-bg { background: #fd7e14; color: white; }
+        .sidebar { min-height: 100vh; background: linear-gradient(180deg, #1a3a8a, #0d1b3e); }
+        .sidebar a { color: white; text-decoration: none; display: block; padding: 12px 20px; transition: 0.3s; border-radius: 8px; margin: 4px 10px; }
+        .sidebar a:hover { background: #c5a059; color: #000; transform: translateX(5px); }
+        .sidebar a.active { background: #c5a059; color: #000; }
+        .sidebar a i { margin-right: 10px; width: 25px; }
+        .vehicle-card { border: none; border-radius: 15px; transition: all 0.3s; cursor: pointer; overflow: hidden; }
+        .vehicle-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .vehicle-header { background: linear-gradient(135deg, #1a3a8a, #0d1b3e); color: white; padding: 15px; position: relative; }
+        .vehicle-placa { font-size: 1.3rem; font-weight: 700; }
+        .criticidad-badge { position: absolute; top: 15px; right: 15px; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .critico-bg { background: #dc3545; animation: pulse 1.5s infinite; }
+        .alto-bg { background: #fd7e14; }
         .medio-bg { background: #ffc107; color: #000; }
-        .bajo-bg { background: #198754; color: white; }
-        .no-evaluado-bg { background: #6c757d; color: white; }
-
-        .estado-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .estado-operativo { background: #198754; color: white; }
-        .estado-mantenimiento { background: #ffc107; color: #000; }
-        .estado-inoperativo { background: #dc3545; color: white; }
-
-        .filtro-bar {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .stat-mini {
-            font-size: 0.8rem;
-            color: #666;
-        }
-        .stat-value {
-            font-weight: 700;
-            color: #333;
-        }
+        .bajo-bg { background: #198754; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+        .estado-operativo { background: #198754; color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; }
+        .filtro-bar { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
-            <i class="fas fa-truck me-2"></i>
-            <span>SuspenTrack - Mocha</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link active" href="vehiculos.html"><i class="fas fa-truck"></i> Vehículos</a></li>
-                <li class="nav-item"><a class="nav-link" href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a></li>
-                <li class="nav-item"><a class="nav-link" href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a></li>
-                <li class="nav-item"><a class="nav-link" href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a></li>
-                <li class="nav-item"><a class="nav-link" href="alertas.html"><i class="fas fa-bell"></i> Alertas</a></li>
-                <li class="nav-item"><a class="nav-link" href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a></li>
-                <li class="nav-item"><a class="nav-link" href="usuario.html"><i class="fas fa-users"></i> Usuarios</a></li>
-                <li class="nav-item"><a class="nav-link" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt"></i> Salir</a></li>
-            </ul>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 sidebar p-0">
+            <div class="text-center py-4"><i class="fas fa-truck fa-3x text-warning"></i><h4 class="text-white mt-2">SuspenTrack</h4><small class="text-white-50">Cantón Mocha</small></div>
+            <hr class="text-white-50 mx-3">
+            <nav>
+                <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="vehiculos.html" class="active"><i class="fas fa-truck"></i> Vehículos</a>
+                <a href="componentes.html"><i class="fas fa-cogs"></i> Componentes</a>
+                <a href="inspecciones.html"><i class="fas fa-search"></i> Inspecciones</a>
+                <a href="mantenimiento.html"><i class="fas fa-tools"></i> Mantenimientos</a>
+                <a href="alertas.html"><i class="fas fa-bell"></i> Alertas</a>
+                <a href="reportes.html"><i class="fas fa-file-pdf"></i> Reportes</a>
+                <a href="usuario.html"><i class="fas fa-users"></i> Usuarios</a>
+                <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+            </nav>
         </div>
-    </div>
-</nav>
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-truck text-primary me-2"></i>
-            Flota de Vehículos
-        </h2>
-        <div>
-            <button class="btn btn-outline-secondary me-2" onclick="exportarExcel()">
-                <i class="fas fa-file-excel me-2"></i> Exportar
-            </button>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalVehiculo" onclick="abrirModalNuevo()">
-                <i class="fas fa-plus me-2"></i> Nuevo Vehículo
-            </button>
-        </div>
-    </div>
+        <div class="col-md-10 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-truck text-primary me-2"></i>Flota de Vehículos</h2>
+                <div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalVehiculo" onclick="abrirModalNuevo()"><i class="fas fa-plus me-2"></i> Nuevo Vehículo</button>
+                </div>
+            </div>
 
-    <!-- Filtros -->
-    <div class="filtro-bar">
-        <div class="row align-items-center">
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Buscar por placa</label>
-                <input type="text" id="buscarPlaca" class="form-control" placeholder="Ej: ABC-123" onkeyup="aplicarFiltros()">
+            <div class="filtro-bar">
+                <div class="row">
+                    <div class="col-md-4"><label class="form-label fw-bold">Buscar por placa</label><input type="text" id="buscarPlaca" class="form-control" placeholder="Ej: ABC-123" onkeyup="aplicarFiltros()"></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Filtrar por criticidad</label><select id="filtroCriticidad" class="form-select" onchange="aplicarFiltros()"><option value="TODOS">Todos</option><option value="CRITICO">Crítico</option><option value="ALTO">Alto</option><option value="MEDIO">Medio</option><option value="BAJO">Bajo</option></select></div>
+                    <div class="col-md-4"><label class="form-label fw-bold">Filtrar por estado</label><select id="filtroEstado" class="form-select" onchange="aplicarFiltros()"><option value="TODOS">Todos</option><option value="OPERATIVO">Operativo</option><option value="MANTENIMIENTO">En mantenimiento</option><option value="INOPERATIVO">Inoperativo</option></select></div>
+                </div>
+                <div class="row mt-2"><div class="col-12 text-end"><button class="btn btn-secondary btn-sm" onclick="limpiarFiltros()"><i class="fas fa-eraser me-2"></i>Limpiar filtros</button></div></div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Filtrar por criticidad</label>
-                <select id="filtroCriticidad" class="form-select" onchange="aplicarFiltros()">
-                    <option value="TODOS">Todos</option>
-                    <option value="CRITICO">Crítico</option>
-                    <option value="ALTO">Alto</option>
-                    <option value="MEDIO">Medio</option>
-                    <option value="BAJO">Bajo</option>
-                    <option value="NO EVALUADO">No evaluado</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">Filtrar por estado</label>
-                <select id="filtroEstado" class="form-select" onchange="aplicarFiltros()">
-                    <option value="TODOS">Todos</option>
-                    <option value="OPERATIVO">Operativo</option>
-                    <option value="MANTENIMIENTO">En mantenimiento</option>
-                    <option value="INOPERATIVO">Inoperativo</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-bold">&nbsp;</label>
-                <button class="btn btn-secondary w-100" onclick="limpiarFiltros()">
-                    <i class="fas fa-eraser me-2"></i> Limpiar filtros
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Grid de vehículos -->
-    <div class="row" id="gridVehiculos">
-        <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-            </div>
-            <p class="mt-2 text-muted">Cargando vehículos...</p>
+            <div class="row" id="gridVehiculos"><div class="col-12 text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Cargando vehículos...</p></div></div>
         </div>
     </div>
 </div>
 
-<!-- MODAL PARA CREAR/EDITAR VEHÍCULO -->
 <div class="modal fade" id="modalVehiculo" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-truck me-2"></i>
-                    <span id="modalTitulo">Nuevo Vehículo</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
+            <div class="modal-header bg-primary text-white"><h5 class="modal-title"><i class="fas fa-truck me-2"></i><span id="modalTitulo">Nuevo Vehículo</span></h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <form id="formVehiculo">
                     <input type="hidden" id="vehiculo_id">
-
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label required">Placa</label>
-                            <input type="text" id="placa" class="form-control" placeholder="Ej: ABC-1234" required>
-                            <small class="text-muted">Formato: 3 letras y 3-4 números</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label required">Marca</label>
-                            <select id="marca" class="form-select" required>
-                                <option value="">Seleccionar marca...</option>
-                                <option value="Chevrolet">Chevrolet</option>
-                                <option value="Ford">Ford</option>
-                                <option value="Hino">Hino</option>
-                                <option value="Isuzu">Isuzu</option>
-                                <option value="Mercedes-Benz">Mercedes-Benz</option>
-                                <option value="Volvo">Volvo</option>
-                                <option value="International">International</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label required">Modelo</label>
-                            <input type="text" id="modelo" class="form-control" placeholder="Ej: NPR, Cargo, 300" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Año</label>
-                            <input type="number" id="anio" class="form-control" placeholder="Ej: 2020" min="1990" max="2026">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Kilometraje Actual</label>
-                            <input type="number" id="kilometraje" class="form-control" placeholder="0" value="0">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Capacidad de Carga (kg)</label>
-                            <input type="number" id="capacidad_carga" class="form-control" placeholder="Ej: 3500" value="0">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Frecuencia de Uso</label>
-                            <select id="frecuencia_uso" class="form-select">
-                                <option value="BAJA">Baja</option>
-                                <option value="MEDIA" selected>Media</option>
-                                <option value="ALTA">Alta</option>
-                            </select>
-                            <small class="text-muted">Influye en el cálculo de criticidad</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Estado General</label>
-                            <select id="estado_general" class="form-select">
-                                <option value="OPERATIVO">Operativo</option>
-                                <option value="MANTENIMIENTO">En mantenimiento</option>
-                                <option value="INOPERATIVO">Inoperativo</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info mt-3">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Nota:</strong> Al registrar un vehículo, se crearán automáticamente sus 6 componentes de suspensión con estado "Bueno".
+                        <div class="col-md-6 mb-3"><label class="form-label required">Placa</label><input type="text" id="placa" class="form-control" placeholder="Ej: ABC-1234" required></div>
+                        <div class="col-md-6 mb-3"><label class="form-label required">Marca</label><select id="marca" class="form-select" required><option value="">Seleccionar...</option><option>Chevrolet</option><option>Ford</option><option>Hino</option><option>Isuzu</option><option>Mercedes-Benz</option></select></div>
+                        <div class="col-md-6 mb-3"><label class="form-label required">Modelo</label><input type="text" id="modelo" class="form-control" required></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Año</label><input type="number" id="anio" class="form-control" placeholder="2020"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Kilometraje</label><input type="number" id="kilometraje" class="form-control" value="0"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Capacidad de carga (kg)</label><input type="number" id="capacidad_carga" class="form-control" value="0"></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Frecuencia de uso</label><select id="frecuencia_uso" class="form-select"><option value="BAJA">Baja</option><option value="MEDIA" selected>Media</option><option value="ALTA">Alta</option></select></div>
+                        <div class="col-md-6 mb-3"><label class="form-label">Estado general</label><select id="estado_general" class="form-select"><option value="OPERATIVO">Operativo</option><option value="MANTENIMIENTO">En mantenimiento</option><option value="INOPERATIVO">Inoperativo</option></select></div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarVehiculo()">
-                    <i class="fas fa-save me-2"></i> Guardar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL PARA CONFIRMAR ELIMINACIÓN -->
-<div class="modal fade" id="modalEliminar" tabindex="-1">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Confirmar Eliminación
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Está seguro que desea eliminar este vehículo?</p>
-                <p class="text-danger small">Se eliminarán también sus componentes e historial.</p>
-                <input type="hidden" id="eliminar_id">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" onclick="confirmarEliminar()">
-                    <i class="fas fa-trash me-2"></i> Eliminar
-                </button>
-            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn btn-primary" onclick="guardarVehiculo()"><i class="fas fa-save me-2"></i> Guardar</button></div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    const token = localStorage.getItem('token');
     let vehiculosData = [];
 
-    if (!token) {
-        window.location.href = 'index.html';
-    }
-
-    // Cargar vehículos
     async function cargarVehiculos() {
         try {
-            const response = await fetch('/api/vehicles', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) throw new Error('Error al cargar vehículos');
-
+            const response = await fetch('/api/vehicles');
             vehiculosData = await response.json();
             aplicarFiltros();
-        } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('gridVehiculos').innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
-                    <p class="text-danger">Error al cargar vehículos</p>
-                    <button class="btn btn-primary" onclick="cargarVehiculos()">
-                        <i class="fas fa-sync-alt me-2"></i> Reintentar
-                    </button>
-                </div>
-            `;
-        }
+        } catch (error) { console.error(error); }
     }
 
-    // Aplicar filtros
     function aplicarFiltros() {
         const busqueda = document.getElementById('buscarPlaca').value.toLowerCase();
         const filtroCriticidad = document.getElementById('filtroCriticidad').value;
         const filtroEstado = document.getElementById('filtroEstado').value;
-
         let filtrados = vehiculosData;
-
-        if (busqueda) {
-            filtrados = filtrados.filter(v => v.placa?.toLowerCase().includes(busqueda));
-        }
-
-        if (filtroCriticidad !== 'TODOS') {
-            filtrados = filtrados.filter(v => (v.criticidad || 'NO EVALUADO') === filtroCriticidad);
-        }
-
-        if (filtroEstado !== 'TODOS') {
-            filtrados = filtrados.filter(v => v.estado_general === filtroEstado);
-        }
-
+        if (busqueda) filtrados = filtrados.filter(v => v.placa?.toLowerCase().includes(busqueda));
+        if (filtroCriticidad !== 'TODOS') filtrados = filtrados.filter(v => (v.criticidad || 'NO EVALUADO') === filtroCriticidad);
+        if (filtroEstado !== 'TODOS') filtrados = filtrados.filter(v => v.estado_general === filtroEstado);
         mostrarGrid(filtrados);
     }
 
-    // Mostrar grid de vehículos
     function mostrarGrid(vehiculos) {
         const grid = document.getElementById('gridVehiculos');
-
-        if (vehiculos.length === 0) {
-            grid.innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-truck fa-3x text-muted mb-3"></i>
-                    <h5>No hay vehículos registrados</h5>
-                    <p class="text-muted">Haga clic en "Nuevo Vehículo" para agregar uno.</p>
-                </div>
-            `;
-            return;
-        }
-
+        if (vehiculos.length === 0) { grid.innerHTML = '<div class="col-12 text-center py-5"><i class="fas fa-truck fa-3x text-muted"></i><h5>No hay vehículos</h5></div>'; return; }
         grid.innerHTML = vehiculos.map(v => `
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card vehicle-card h-100">
                     <div class="vehicle-header">
-                        <div class="vehicle-placa">
-                            <i class="fas fa-tag me-1"></i> ${v.placa}
-                        </div>
-                        <span class="criticidad-badge ${getCriticidadClass(v.criticidad)}">
-                            ${v.criticidad || 'NO EVALUADO'}
-                        </span>
+                        <div class="vehicle-placa"><i class="fas fa-tag me-1"></i> ${v.placa}</div>
+                        <span class="criticidad-badge ${v.criticidad === 'CRITICO' ? 'critico-bg' : v.criticidad === 'ALTO' ? 'alto-bg' : v.criticidad === 'MEDIO' ? 'medio-bg' : v.criticidad === 'BAJO' ? 'bajo-bg' : ''}">${v.criticidad || 'NO EVALUADO'}</span>
                     </div>
-                    <div class="vehicle-body">
-                        <h5 class="mb-2">${v.marca} ${v.modelo}</h5>
-                        <p class="text-muted small mb-3">${v.anio || 'Año no especificado'}</p>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="stat-mini">Kilometraje</div>
-                                <div class="stat-value">${(v.kilometraje || 0).toLocaleString()} km</div>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-mini">Capacidad</div>
-                                <div class="stat-value">${(v.capacidad_carga || 0).toLocaleString()} kg</div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="estado-badge estado-${v.estado_general?.toLowerCase()}">
-                                ${getEstadoNombre(v.estado_general)}
-                            </span>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-outline-primary" onclick="editarVehiculo(${v.id})" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-info" onclick="verHistorial(${v.id})" title="Historial">
-                                    <i class="fas fa-history"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="abrirEliminar(${v.id})" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning" onclick="recalcularCriticidad(${v.id})" title="Recalcular criticidad">
-                                    <i class="fas fa-chart-line"></i>
-                                </button>
-                            </div>
+                    <div class="vehicle-body p-3">
+                        <h5>${v.marca} ${v.modelo}</h5>
+                        <p class="text-muted small">${v.anio || 'Año no especificado'}</p>
+                        <div class="row mb-2"><div class="col-6"><small>Kilometraje</small><br><strong>${(v.kilometraje || 0).toLocaleString()} km</strong></div><div class="col-6"><small>Capacidad</small><br><strong>${(v.capacidad_carga || 0).toLocaleString()} kg</strong></div></div>
+                        <div class="d-flex justify-content-between">
+                            <span class="estado-operativo">${v.estado_general || 'OPERATIVO'}</span>
+                            <div><button class="btn btn-sm btn-outline-primary me-1" onclick="editarVehiculo(${v.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-outline-danger" onclick="eliminarVehiculo(${v.id})"><i class="fas fa-trash"></i></button></div>
                         </div>
                     </div>
                 </div>
@@ -419,47 +139,20 @@
         `).join('');
     }
 
-    function getCriticidadClass(criticidad) {
-        const clases = {
-            'CRITICO': 'critico-bg',
-            'ALTO': 'alto-bg',
-            'MEDIO': 'medio-bg',
-            'BAJO': 'bajo-bg'
-        };
-        return clases[criticidad] || 'no-evaluado-bg';
-    }
-
-    function getEstadoNombre(estado) {
-        const nombres = {
-            'OPERATIVO': '✅ Operativo',
-            'MANTENIMIENTO': '🔧 En mantenimiento',
-            'INOPERATIVO': '❌ Inoperativo'
-        };
-        return nombres[estado] || estado;
-    }
-
-    // Abrir modal nuevo
     function abrirModalNuevo() {
         document.getElementById('modalTitulo').textContent = 'Nuevo Vehículo';
         document.getElementById('vehiculo_id').value = '';
-        document.getElementById('placa').value = '';
-        document.getElementById('marca').value = '';
-        document.getElementById('modelo').value = '';
-        document.getElementById('anio').value = '';
+        document.getElementById('formVehiculo').reset();
         document.getElementById('kilometraje').value = '0';
         document.getElementById('capacidad_carga').value = '0';
         document.getElementById('frecuencia_uso').value = 'MEDIA';
         document.getElementById('estado_general').value = 'OPERATIVO';
     }
 
-    // Editar vehículo
     async function editarVehiculo(id) {
         try {
-            const response = await fetch(`/api/vehicles/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch(`/api/vehicles/${id}`);
             const v = await response.json();
-
             document.getElementById('modalTitulo').textContent = 'Editar Vehículo';
             document.getElementById('vehiculo_id').value = v.id;
             document.getElementById('placa').value = v.placa;
@@ -470,127 +163,43 @@
             document.getElementById('capacidad_carga').value = v.capacidad_carga;
             document.getElementById('frecuencia_uso').value = v.frecuencia_uso || 'MEDIA';
             document.getElementById('estado_general').value = v.estado_general;
-
             const modal = new bootstrap.Modal(document.getElementById('modalVehiculo'));
             modal.show();
-        } catch (error) {
-            alert('Error al cargar el vehículo');
-        }
+        } catch (error) { alert('Error al cargar'); }
     }
 
-    // Guardar vehículo
     async function guardarVehiculo() {
         const id = document.getElementById('vehiculo_id').value;
-        const placa = document.getElementById('placa').value.trim().toUpperCase();
-        const marca = document.getElementById('marca').value;
-        const modelo = document.getElementById('modelo').value.trim();
-        const anio = document.getElementById('anio').value;
-        const kilometraje = document.getElementById('kilometraje').value;
-        const capacidad_carga = document.getElementById('capacidad_carga').value;
-        const frecuencia_uso = document.getElementById('frecuencia_uso').value;
-        const estado_general = document.getElementById('estado_general').value;
-
-        if (!placa || !marca || !modelo) {
-            alert('❌ Por favor complete los campos requeridos');
-            return;
-        }
-
-        const btnGuardar = document.querySelector('#modalVehiculo .btn-primary');
-        const originalText = btnGuardar.innerHTML;
-        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Guardando...';
-        btnGuardar.disabled = true;
-
-        const data = { placa, marca, modelo, anio, kilometraje, capacidad_carga, frecuencia_uso, estado_general };
-
+        const data = {
+            placa: document.getElementById('placa').value.trim().toUpperCase(),
+            marca: document.getElementById('marca').value,
+            modelo: document.getElementById('modelo').value.trim(),
+            anio: document.getElementById('anio').value || null,
+            kilometraje: parseInt(document.getElementById('kilometraje').value) || 0,
+            capacidad_carga: parseFloat(document.getElementById('capacidad_carga').value) || 0,
+            frecuencia_uso: document.getElementById('frecuencia_uso').value,
+            estado_general: document.getElementById('estado_general').value
+        };
+        if (!data.placa || !data.marca || !data.modelo) { alert('Complete los campos requeridos'); return; }
         try {
             const url = id ? `/api/vehicles/${id}` : '/api/vehicles';
             const method = id ? 'PUT' : 'POST';
+            const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (response.ok) { alert(id ? 'Vehículo actualizado' : 'Vehículo registrado'); bootstrap.Modal.getInstance(document.getElementById('modalVehiculo')).hide(); cargarVehiculos(); }
+            else alert('Error al guardar');
+        } catch (error) { alert('Error de conexión'); }
+    }
 
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                alert('✅ ' + (id ? 'Vehículo actualizado' : 'Vehículo registrado'));
-                bootstrap.Modal.getInstance(document.getElementById('modalVehiculo')).hide();
-                cargarVehiculos();
-            } else {
-                alert('❌ Error: ' + (result.error || 'No se pudo guardar'));
-            }
-        } catch (error) {
-            alert('❌ Error de conexión');
-        } finally {
-            btnGuardar.innerHTML = originalText;
-            btnGuardar.disabled = false;
+    async function eliminarVehiculo(id) {
+        if (confirm('¿Eliminar este vehículo?')) {
+            try {
+                const response = await fetch(`/api/vehicles/${id}`, { method: 'DELETE' });
+                if (response.ok) { alert('Eliminado'); cargarVehiculos(); }
+                else alert('Error al eliminar');
+            } catch (error) { alert('Error de conexión'); }
         }
     }
 
-    // Recalcular criticidad
-    async function recalcularCriticidad(id) {
-        try {
-            const response = await fetch(`/api/vehicles/${id}/recalculate`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                alert('✅ Criticidad recalculada exitosamente');
-                cargarVehiculos();
-            } else {
-                alert('❌ Error al recalcular');
-            }
-        } catch (error) {
-            alert('❌ Error de conexión');
-        }
-    }
-
-    // Eliminar vehículo
-    let eliminarId = null;
-    function abrirEliminar(id) {
-        eliminarId = id;
-        const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-        modal.show();
-    }
-
-    async function confirmarEliminar() {
-        if (!eliminarId) return;
-
-        try {
-            const response = await fetch(`/api/vehicles/${eliminarId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (response.ok) {
-                alert('✅ Vehículo eliminado');
-                bootstrap.Modal.getInstance(document.getElementById('modalEliminar')).hide();
-                cargarVehiculos();
-            } else {
-                alert('❌ Error al eliminar');
-            }
-        } catch (error) {
-            alert('❌ Error de conexión');
-        }
-    }
-
-    // Ver historial
-    function verHistorial(id) {
-        window.location.href = `mantenimiento.html?vehiculo_id=${id}`;
-    }
-
-    // Exportar a Excel
-    function exportarExcel() {
-        window.location.href = '/api/reports/vehicles/export?format=xlsx';
-    }
-
-    // Limpiar filtros
     function limpiarFiltros() {
         document.getElementById('buscarPlaca').value = '';
         document.getElementById('filtroCriticidad').value = 'TODOS';
@@ -598,17 +207,7 @@
         aplicarFiltros();
     }
 
-    function cerrarSesion() {
-        if (confirm('¿Está seguro que desea cerrar sesión?')) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
-        }
-    }
-
-    // Cargar datos al iniciar
     cargarVehiculos();
 </script>
-
 </body>
 </html>

@@ -360,23 +360,13 @@ body {
    ============================================ */
 
 @keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in {
@@ -388,10 +378,10 @@ body {
 }
 
 /* ============================================
-   COMPONENTES ESPECÍFICOS DE SUSPENTRACK
+   COMPONENTES ESPECÍFICOS
    ============================================ */
 
-/* Tarjetas de componentes de suspensión */
+/* Tarjetas de componentes */
 .componente-card {
     border: 1px solid var(--gris-claro);
     border-radius: 12px;
