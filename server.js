@@ -1,11 +1,11 @@
 // ============================================
-// SUSPENTRACK - SERVIDOR SIN LOGIN
+// SUSPENTRACK - SERVIDOR CON POSTGRESQL
 // ============================================
 
 require('dotenv').config();
 
 const express = require('express');
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 const cors = require('cors');
 const path = require('path');
 const bcrypt = require('bcryptjs');
@@ -37,15 +37,11 @@ app.get('/', (req, res) => {
 });
 
 // ============================================
-// CONEXIÓN A BASE DE DATOS
+// CONEXIÓN A POSTGRESQL
 // ============================================
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'suspentrack',
-    waitForConnections: true,
-    connectionLimit: 10
+const pool = new Pool({
+    connectionString: 'postgresql://suspentrack_db_user:ucsZVGVCNBMG2XEeLn4dkizU6WEI1ecL@dpg-d8jsj29kh4rs73egss80-a/suspentrack_db',
+    ssl: { rejectUnauthorized: false }
 });
 
 app.locals.pool = pool;
@@ -54,114 +50,111 @@ app.locals.pool = pool;
 // CREAR TABLAS AUTOMÁTICAMENTE
 // ============================================
 async function crearTablas() {
-    const connection = await pool.getConnection();
     try {
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS usuarios(
-                                                   id INT AUTO_INCREMENT PRIMARY KEY,
-                                                   nombre VARCHAR(100) NOT NULL,
+                id SERIAL PRIMARY KEY,
+                nombre VARCHAR(100) NOT NULL,
                 correo VARCHAR(100) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                rol ENUM('ADMIN','TECNICO','OPERADOR') NOT NULL,
-                estado ENUM('ACTIVO','INACTIVO') DEFAULT 'ACTIVO',
+                rol VARCHAR(20) NOT NULL,
+                estado VARCHAR(20) DEFAULT 'ACTIVO',
                 fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS vehiculos(
-                                                    id INT AUTO_INCREMENT PRIMARY KEY,
-                                                    placa VARCHAR(10) UNIQUE NOT NULL,
+                id SERIAL PRIMARY KEY,
+                placa VARCHAR(10) UNIQUE NOT NULL,
                 marca VARCHAR(50) NOT NULL,
                 modelo VARCHAR(50) NOT NULL,
                 anio INT,
                 kilometraje INT DEFAULT 0,
                 capacidad_carga DECIMAL(10,2),
-                frecuencia_uso ENUM('BAJA','MEDIA','ALTA') DEFAULT 'MEDIA',
-                estado_general ENUM('OPERATIVO','MANTENIMIENTO','INOPERATIVO') DEFAULT 'OPERATIVO',
+                frecuencia_uso VARCHAR(10) DEFAULT 'MEDIA',
+                estado_general VARCHAR(20) DEFAULT 'OPERATIVO',
                 criticidad VARCHAR(20) DEFAULT 'NO EVALUADO',
                 ultimo_mantenimiento DATE,
                 fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS componentes(
-                                                      id INT AUTO_INCREMENT PRIMARY KEY,
-                                                      vehiculo_id INT NOT NULL,
-                                                      nombre ENUM('AMORTIGUADOR','RESORTE','ROTULA','BUJE','BRAZO_SUSPENSION','BARRA_ESTABILIZADORA') NOT NULL,
-                estado ENUM('EXCELENTE','BUENO','REGULAR','MALO','CRITICO') DEFAULT 'BUENO',
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INT NOT NULL,
+                nombre VARCHAR(30) NOT NULL,
+                estado VARCHAR(10) DEFAULT 'BUENO',
                 fecha_inspeccion DATE,
                 observaciones TEXT
-                )
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS inspecciones(
-                                                       id INT AUTO_INCREMENT PRIMARY KEY,
-                                                       vehiculo_id INT NOT NULL,
-                                                       tecnico_id INT NOT NULL,
-                                                       fecha DATE NOT NULL,
-                                                       kilometraje INT DEFAULT 0,
-                                                       observaciones TEXT,
-                                                       evidencia VARCHAR(500)
-                )
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INT NOT NULL,
+                tecnico_id INT NOT NULL,
+                fecha DATE NOT NULL,
+                kilometraje INT DEFAULT 0,
+                observaciones TEXT,
+                evidencia VARCHAR(500)
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS mantenimientos(
-                                                         id INT AUTO_INCREMENT PRIMARY KEY,
-                                                         vehiculo_id INT NOT NULL,
-                                                         tecnico_id INT NOT NULL,
-                                                         tipo ENUM('PREVENTIVO','CORRECTIVO') NOT NULL,
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INT NOT NULL,
+                tecnico_id INT NOT NULL,
+                tipo VARCHAR(20) NOT NULL,
                 fecha DATE NOT NULL,
                 costo DECIMAL(10,2) DEFAULT 0,
                 descripcion TEXT
-                )
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS alertas(
-                                                  id INT AUTO_INCREMENT PRIMARY KEY,
-                                                  vehiculo_id INT NOT NULL,
-                                                  nivel ENUM('BAJO','MEDIO','ALTO','CRITICO') NOT NULL,
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INT NOT NULL,
+                nivel VARCHAR(10) NOT NULL,
                 mensaje TEXT,
                 fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+            )
         `);
 
-        await connection.query(`
+        await pool.query(`
             CREATE TABLE IF NOT EXISTS priorizaciones(
-                                                         id INT AUTO_INCREMENT PRIMARY KEY,
-                                                         vehiculo_id INT NOT NULL,
-                                                         kilometraje_puntos INT DEFAULT 0,
-                                                         mantenimiento_puntos INT DEFAULT 0,
-                                                         fallas_puntos INT DEFAULT 0,
-                                                         componentes_puntos INT DEFAULT 0,
-                                                         uso_puntos INT DEFAULT 0,
-                                                         puntaje_total INT DEFAULT 0,
-                                                         clasificacion ENUM('BAJO','MEDIO','ALTO','CRITICO'),
+                id SERIAL PRIMARY KEY,
+                vehiculo_id INT NOT NULL,
+                kilometraje_puntos INT DEFAULT 0,
+                mantenimiento_puntos INT DEFAULT 0,
+                fallas_puntos INT DEFAULT 0,
+                componentes_puntos INT DEFAULT 0,
+                uso_puntos INT DEFAULT 0,
+                puntaje_total INT DEFAULT 0,
+                clasificacion VARCHAR(10),
                 fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+            )
         `);
 
-        await connection.query(`
-            INSERT IGNORE INTO usuarios (nombre, correo, password, rol, estado) VALUES 
-            ('Administrador', 'admin@suspentrack.com', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MrJ5qTqC8q8q8q8q8q8q8q8q8q8q', 'ADMIN', 'ACTIVO')
+        await pool.query(`
+            INSERT INTO usuarios (nombre, correo, password, rol, estado) 
+            SELECT 'Administrador', 'admin@suspentrack.com', '$2a$10$N9qo8uLOickgx2ZMRZoMy.MrJ5qTqC8q8q8q8q8q8q8q8q8q8q', 'ADMIN', 'ACTIVO'
+            WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE correo = 'admin@suspentrack.com')
         `);
 
-        await connection.query(`
-            INSERT IGNORE INTO vehiculos (placa, marca, modelo, anio, kilometraje, capacidad_carga, frecuencia_uso, estado_general) VALUES
-            ('ABC-123', 'Chevrolet', 'NPR', 2020, 85000, 3500, 'ALTA', 'OPERATIVO'),
-            ('DEF-456', 'Ford', 'Cargo', 2019, 120000, 4000, 'ALTA', 'MANTENIMIENTO'),
-            ('GHI-789', 'Hino', '300', 2021, 45000, 3800, 'MEDIA', 'OPERATIVO')
+        await pool.query(`
+            INSERT INTO vehiculos (placa, marca, modelo, anio, kilometraje, capacidad_carga, frecuencia_uso, estado_general)
+            SELECT 'ABC-123', 'Chevrolet', 'NPR', 2020, 85000, 3500, 'ALTA', 'OPERATIVO'
+            WHERE NOT EXISTS (SELECT 1 FROM vehiculos WHERE placa = 'ABC-123')
         `);
 
         console.log('✅ Tablas creadas/verificadas correctamente');
     } catch (error) {
         console.error('❌ Error creando tablas:', error.message);
-    } finally {
-        connection.release();
     }
 }
 
@@ -171,9 +164,9 @@ crearTablas();
 // ============================================
 // ALGORITMO DE PRIORIZACIÓN
 // ============================================
-async function calcularCriticidad(vehiculoId, connection) {
-    const [vehiculo] = await connection.query(
-        'SELECT kilometraje, frecuencia_uso, ultimo_mantenimiento FROM vehiculos WHERE id = ?',
+async function calcularCriticidad(vehiculoId, client) {
+    const { rows: vehiculo } = await client.query(
+        'SELECT kilometraje, frecuencia_uso, ultimo_mantenimiento FROM vehiculos WHERE id = $1',
         [vehiculoId]
     );
 
@@ -186,13 +179,13 @@ async function calcularCriticidad(vehiculoId, connection) {
         diasSinMantenimiento = Math.floor((ahora - ultimo) / (1000 * 60 * 60 * 24));
     }
 
-    const [fallas] = await connection.query(
-        'SELECT COUNT(*) as total FROM componentes WHERE vehiculo_id = ? AND estado IN ("MALO", "CRITICO")',
-        [vehiculoId]
+    const { rows: fallas } = await client.query(
+        'SELECT COUNT(*) as total FROM componentes WHERE vehiculo_id = $1 AND estado IN ($2, $3)',
+        [vehiculoId, 'MALO', 'CRITICO']
     );
 
-    const [componentes] = await connection.query(
-        'SELECT estado FROM componentes WHERE vehiculo_id = ?',
+    const { rows: componentes } = await client.query(
+        'SELECT estado FROM componentes WHERE vehiculo_id = $1',
         [vehiculoId]
     );
 
@@ -218,25 +211,25 @@ async function calcularCriticidad(vehiculoId, connection) {
     else if (puntajeTotal >= 40) clasificacion = 'MEDIO';
     else clasificacion = 'BAJO';
 
-    await connection.query(
-        `INSERT INTO priorizaciones
-         (vehiculo_id, kilometraje_puntos, mantenimiento_puntos, fallas_puntos, componentes_puntos, uso_puntos, puntaje_total, clasificacion)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    await client.query(
+        `INSERT INTO priorizaciones 
+        (vehiculo_id, kilometraje_puntos, mantenimiento_puntos, fallas_puntos, componentes_puntos, uso_puntos, puntaje_total, clasificacion) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [vehiculoId, kmPuntaje, tiempoPuntaje, fallasPuntaje, puntajeComponentes, usoPuntaje, puntajeTotal, clasificacion]
     );
 
-    await connection.query('UPDATE vehiculos SET criticidad = ? WHERE id = ?', [clasificacion, vehiculoId]);
+    await client.query('UPDATE vehiculos SET criticidad = $1 WHERE id = $2', [clasificacion, vehiculoId]);
 
     if (clasificacion === 'CRITICO') {
-        const [existe] = await connection.query(
-            'SELECT id FROM alertas WHERE vehiculo_id = ? AND nivel = "CRITICO" AND fecha > DATE_SUB(NOW(), INTERVAL 1 DAY)',
-            [vehiculoId]
+        const { rows: existe } = await client.query(
+            'SELECT id FROM alertas WHERE vehiculo_id = $1 AND nivel = $2 AND fecha > NOW() - INTERVAL \'1 day\'',
+            [vehiculoId, 'CRITICO']
         );
 
         if (existe.length === 0) {
-            await connection.query(
-                `INSERT INTO alertas (vehiculo_id, nivel, mensaje)
-                 VALUES (?, ?, ?)`,
+            await client.query(
+                `INSERT INTO alertas (vehiculo_id, nivel, mensaje) 
+                VALUES ($1, $2, $3)`,
                 [vehiculoId, 'CRITICO', `⚠️ ALERTA CRÍTICA: Vehículo requiere mantenimiento urgente. Puntaje total: ${puntajeTotal}/100`]
             );
         }
@@ -250,7 +243,7 @@ async function calcularCriticidad(vehiculoId, connection) {
 // ============================================
 app.get('/api/vehicles', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM vehiculos ORDER BY id DESC');
+        const { rows } = await pool.query('SELECT * FROM vehiculos ORDER BY id DESC');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -259,7 +252,7 @@ app.get('/api/vehicles', async (req, res) => {
 
 app.get('/api/vehicles/:id', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM vehiculos WHERE id = ?', [req.params.id]);
+        const { rows } = await pool.query('SELECT * FROM vehiculos WHERE id = $1', [req.params.id]);
         if (rows.length === 0) return res.status(404).json({ error: 'Vehículo no encontrado' });
         res.json(rows[0]);
     } catch (error) {
@@ -268,64 +261,32 @@ app.get('/api/vehicles/:id', async (req, res) => {
 });
 
 app.post('/api/vehicles', async (req, res) => {
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
-        await connection.beginTransaction();
+        await client.query('BEGIN');
         const { placa, marca, modelo, anio, kilometraje, capacidad_carga, frecuencia_uso, estado_general } = req.body;
 
-        const [result] = await connection.query(
+        const { rows } = await client.query(
             `INSERT INTO vehiculos (placa, marca, modelo, anio, kilometraje, capacidad_carga, frecuencia_uso, estado_general)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
             [placa, marca, modelo, anio || null, kilometraje || 0, capacidad_carga || 0, frecuencia_uso || 'MEDIA', estado_general || 'OPERATIVO']
         );
 
         const componentes = ['AMORTIGUADOR', 'RESORTE', 'ROTULA', 'BUJE', 'BRAZO_SUSPENSION', 'BARRA_ESTABILIZADORA'];
         for (const comp of componentes) {
-            await connection.query(
-                'INSERT INTO componentes (vehiculo_id, nombre, estado, fecha_inspeccion) VALUES (?, ?, "BUENO", CURDATE())',
-                [result.insertId, comp]
+            await client.query(
+                'INSERT INTO componentes (vehiculo_id, nombre, estado, fecha_inspeccion) VALUES ($1, $2, $3, CURRENT_DATE)',
+                [rows[0].id, comp, 'BUENO']
             );
         }
 
-        await connection.commit();
-        res.json({ id: result.insertId, mensaje: 'Vehículo registrado exitosamente' });
+        await client.query('COMMIT');
+        res.json({ id: rows[0].id, mensaje: 'Vehículo registrado exitosamente' });
     } catch (error) {
-        await connection.rollback();
+        await client.query('ROLLBACK');
         res.status(500).json({ error: error.message });
     } finally {
-        connection.release();
-    }
-});
-
-app.put('/api/vehicles/:id', async (req, res) => {
-    try {
-        const { placa, marca, modelo, anio, kilometraje, capacidad_carga, estado_general } = req.body;
-        await pool.query(
-            `UPDATE vehiculos SET placa=?, marca=?, modelo=?, anio=?, kilometraje=?, capacidad_carga=?, estado_general=? WHERE id=?`,
-            [placa, marca, modelo, anio, kilometraje, capacidad_carga, estado_general, req.params.id]
-        );
-        res.json({ mensaje: 'Vehículo actualizado' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.delete('/api/vehicles/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM vehiculos WHERE id = ?', [req.params.id]);
-        res.json({ mensaje: 'Vehículo eliminado' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/api/vehicles/:id/recalculate', async (req, res) => {
-    try {
-        const resultado = await calcularCriticidad(req.params.id, pool);
-        if (!resultado) return res.status(404).json({ error: 'Vehículo no encontrado' });
-        res.json({ mensaje: 'Criticidad recalculada', ...resultado });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+        client.release();
     }
 });
 
@@ -334,18 +295,8 @@ app.post('/api/vehicles/:id/recalculate', async (req, res) => {
 // ============================================
 app.get('/api/components', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT c.*, v.placa FROM componentes c JOIN vehiculos v ON c.vehiculo_id = v.id');
+        const { rows } = await pool.query('SELECT c.*, v.placa FROM componentes c JOIN vehiculos v ON c.vehiculo_id = v.id');
         res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/components/:id', async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT * FROM componentes WHERE id = ?', [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ error: 'Componente no encontrado' });
-        res.json(rows[0]);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -354,24 +305,12 @@ app.get('/api/components/:id', async (req, res) => {
 app.post('/api/components', async (req, res) => {
     try {
         const { vehiculo_id, nombre, estado, observaciones } = req.body;
-        const [result] = await pool.query(
-            'INSERT INTO componentes (vehiculo_id, nombre, estado, fecha_inspeccion, observaciones) VALUES (?, ?, ?, CURDATE(), ?)',
+        const { rows } = await pool.query(
+            'INSERT INTO componentes (vehiculo_id, nombre, estado, fecha_inspeccion, observaciones) VALUES ($1, $2, $3, CURRENT_DATE, $4) RETURNING id',
             [vehiculo_id, nombre, estado, observaciones]
         );
         await calcularCriticidad(vehiculo_id, pool);
-        res.json({ id: result.insertId, mensaje: 'Componente registrado' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.put('/api/components/:id', async (req, res) => {
-    try {
-        const { estado, observaciones } = req.body;
-        const [componente] = await pool.query('SELECT vehiculo_id FROM componentes WHERE id = ?', [req.params.id]);
-        await pool.query('UPDATE componentes SET estado = ?, observaciones = ?, fecha_inspeccion = CURDATE() WHERE id = ?', [estado, observaciones, req.params.id]);
-        if (componente.length > 0) await calcularCriticidad(componente[0].vehiculo_id, pool);
-        res.json({ mensaje: 'Componente actualizado' });
+        res.json({ id: rows[0].id, mensaje: 'Componente registrado' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -382,7 +321,7 @@ app.put('/api/components/:id', async (req, res) => {
 // ============================================
 app.get('/api/maintenances', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT m.*, v.placa FROM mantenimientos m JOIN vehiculos v ON m.vehiculo_id = v.id ORDER BY m.fecha DESC');
+        const { rows } = await pool.query('SELECT m.*, v.placa FROM mantenimientos m JOIN vehiculos v ON m.vehiculo_id = v.id ORDER BY m.fecha DESC');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -390,65 +329,23 @@ app.get('/api/maintenances', async (req, res) => {
 });
 
 app.post('/api/maintenances', async (req, res) => {
-    const connection = await pool.getConnection();
+    const client = await pool.connect();
     try {
-        await connection.beginTransaction();
+        await client.query('BEGIN');
         const { vehiculo_id, tecnico_id, tipo, fecha, costo, kilometraje, descripcion } = req.body;
-        const [result] = await connection.query(
-            'INSERT INTO mantenimientos (vehiculo_id, tecnico_id, tipo, fecha, costo, descripcion) VALUES (?, ?, ?, ?, ?, ?)',
+        const { rows } = await client.query(
+            'INSERT INTO mantenimientos (vehiculo_id, tecnico_id, tipo, fecha, costo, descripcion) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
             [vehiculo_id, tecnico_id, tipo, fecha, costo, descripcion]
         );
-        await connection.query('UPDATE vehiculos SET kilometraje = ?, ultimo_mantenimiento = ? WHERE id = ?', [kilometraje, fecha, vehiculo_id]);
-        await connection.commit();
+        await client.query('UPDATE vehiculos SET kilometraje = $1, ultimo_mantenimiento = $2 WHERE id = $3', [kilometraje, fecha, vehiculo_id]);
+        await client.query('COMMIT');
         await calcularCriticidad(vehiculo_id, pool);
-        res.json({ id: result.insertId, mensaje: 'Mantenimiento registrado' });
+        res.json({ id: rows[0].id, mensaje: 'Mantenimiento registrado' });
     } catch (error) {
-        await connection.rollback();
+        await client.query('ROLLBACK');
         res.status(500).json({ error: error.message });
     } finally {
-        connection.release();
-    }
-});
-
-// ============================================
-// ENDPOINTS DE INSPECCIONES
-// ============================================
-app.get('/api/inspections', async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT i.*, v.placa FROM inspecciones i JOIN vehiculos v ON i.vehiculo_id = v.id ORDER BY i.fecha DESC');
-        res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/api/inspections', async (req, res) => {
-    const connection = await pool.getConnection();
-    try {
-        await connection.beginTransaction();
-        const { vehiculo_id, tecnico_id, fecha, kilometraje, observaciones, componentes } = req.body;
-        const [result] = await connection.query(
-            'INSERT INTO inspecciones (vehiculo_id, tecnico_id, fecha, kilometraje, observaciones) VALUES (?, ?, ?, ?, ?)',
-            [vehiculo_id, tecnico_id, fecha, kilometraje, observaciones]
-        );
-
-        if (componentes && componentes.length > 0) {
-            for (const comp of componentes) {
-                await connection.query(
-                    'UPDATE componentes SET estado = ?, fecha_inspeccion = ?, observaciones = ? WHERE vehiculo_id = ? AND nombre = ?',
-                    [comp.estado, fecha, comp.observaciones || null, vehiculo_id, comp.nombre]
-                );
-            }
-        }
-
-        await connection.commit();
-        await calcularCriticidad(vehiculo_id, pool);
-        res.json({ id: result.insertId, mensaje: 'Inspección registrada' });
-    } catch (error) {
-        await connection.rollback();
-        res.status(500).json({ error: error.message });
-    } finally {
-        connection.release();
+        client.release();
     }
 });
 
@@ -457,7 +354,7 @@ app.post('/api/inspections', async (req, res) => {
 // ============================================
 app.get('/api/alerts', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT a.*, v.placa FROM alertas a JOIN vehiculos v ON a.vehiculo_id = v.id ORDER BY a.fecha DESC');
+        const { rows } = await pool.query('SELECT a.*, v.placa FROM alertas a JOIN vehiculos v ON a.vehiculo_id = v.id ORDER BY a.fecha DESC');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -466,7 +363,7 @@ app.get('/api/alerts', async (req, res) => {
 
 app.delete('/api/alerts/:id', async (req, res) => {
     try {
-        await pool.query('DELETE FROM alertas WHERE id = ?', [req.params.id]);
+        await pool.query('DELETE FROM alertas WHERE id = $1', [req.params.id]);
         res.json({ mensaje: 'Alerta eliminada' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -478,18 +375,8 @@ app.delete('/api/alerts/:id', async (req, res) => {
 // ============================================
 app.get('/api/users', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT id, nombre, correo, rol, estado FROM usuarios');
+        const { rows } = await pool.query('SELECT id, nombre, correo, rol, estado FROM usuarios');
         res.json(rows);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/users/:id', async (req, res) => {
-    try {
-        const [rows] = await pool.query('SELECT id, nombre, correo, rol, estado FROM usuarios WHERE id = ?', [req.params.id]);
-        if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
-        res.json(rows[0]);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -499,27 +386,11 @@ app.post('/api/users', async (req, res) => {
     try {
         const { nombre, correo, password, rol } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const [result] = await pool.query('INSERT INTO usuarios (nombre, correo, password, rol, estado) VALUES (?, ?, ?, ?, "ACTIVO")', [nombre, correo, hashedPassword, rol]);
-        res.json({ id: result.insertId, mensaje: 'Usuario creado' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.put('/api/users/:id', async (req, res) => {
-    try {
-        const { nombre, correo, rol, estado } = req.body;
-        await pool.query('UPDATE usuarios SET nombre = ?, correo = ?, rol = ?, estado = ? WHERE id = ?', [nombre, correo, rol, estado, req.params.id]);
-        res.json({ mensaje: 'Usuario actualizado' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.delete('/api/users/:id', async (req, res) => {
-    try {
-        await pool.query('DELETE FROM usuarios WHERE id = ?', [req.params.id]);
-        res.json({ mensaje: 'Usuario eliminado' });
+        const { rows } = await pool.query(
+            'INSERT INTO usuarios (nombre, correo, password, rol, estado) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [nombre, correo, hashedPassword, rol, 'ACTIVO']
+        );
+        res.json({ id: rows[0].id, mensaje: 'Usuario creado' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -530,40 +401,20 @@ app.delete('/api/users/:id', async (req, res) => {
 // ============================================
 app.get('/api/dashboard', async (req, res) => {
     try {
-        const [[vehiculos]] = await pool.query('SELECT COUNT(*) as total FROM vehiculos');
-        const [[operativos]] = await pool.query('SELECT COUNT(*) as total FROM vehiculos WHERE estado_general = "OPERATIVO"');
-        const [[criticos]] = await pool.query('SELECT COUNT(*) as total FROM vehiculos WHERE criticidad = "CRITICO"');
-        const [[costos]] = await pool.query('SELECT IFNULL(SUM(costo), 0) as total FROM mantenimientos WHERE YEAR(fecha) = YEAR(CURDATE())');
-        const [[mantenimientosRealizados]] = await pool.query('SELECT COUNT(*) as total FROM mantenimientos WHERE YEAR(fecha) = YEAR(CURDATE())');
-        const [[mantenimientosPendientes]] = await pool.query('SELECT COUNT(*) as total FROM alertas WHERE nivel = "CRITICO"');
-
-        const [componentesDesgaste] = await pool.query(
-            `SELECT nombre, COUNT(*) as cantidad FROM componentes WHERE estado IN ("MALO", "CRITICO") GROUP BY nombre ORDER BY cantidad DESC LIMIT 5`
-        );
-
-        const [alertasRecientes] = await pool.query(
-            `SELECT a.*, v.placa FROM alertas a JOIN vehiculos v ON a.vehiculo_id = v.id ORDER BY a.fecha DESC LIMIT 10`
-        );
-
-        const [mantenimientosPorMes] = await pool.query(
-            `SELECT DATE_FORMAT(fecha, '%Y-%m') as mes, COUNT(*) as cantidad FROM mantenimientos WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) GROUP BY DATE_FORMAT(fecha, '%Y-%m') ORDER BY mes ASC`
-        );
-
-        const [vehiculosPorCriticidad] = await pool.query(
-            `SELECT criticidad, COUNT(*) as cantidad FROM vehiculos GROUP BY criticidad`
-        );
+        const { rows: vehiculos } = await pool.query('SELECT COUNT(*) as total FROM vehiculos');
+        const { rows: operativos } = await pool.query('SELECT COUNT(*) as total FROM vehiculos WHERE estado_general = $1', ['OPERATIVO']);
+        const { rows: criticos } = await pool.query('SELECT COUNT(*) as total FROM vehiculos WHERE criticidad = $1', ['CRITICO']);
+        const { rows: costos } = await pool.query('SELECT COALESCE(SUM(costo), 0) as total FROM mantenimientos WHERE EXTRACT(YEAR FROM fecha) = EXTRACT(YEAR FROM CURRENT_DATE)');
 
         res.json({
-            total_vehiculos: vehiculos.total,
-            vehiculos_operativos: operativos.total,
-            vehiculos_criticos: criticos.total,
-            costos_acumulados: costos.total,
-            mantenimientos_realizados: mantenimientosRealizados.total,
-            mantenimientos_pendientes: mantenimientosPendientes.total,
-            componentes_desgaste: componentesDesgaste,
-            alertas_recientes: alertasRecientes,
-            mantenimientos_por_mes: mantenimientosPorMes,
-            vehiculos_por_criticidad: vehiculosPorCriticidad
+            total_vehiculos: parseInt(vehiculos[0].total),
+            vehiculos_operativos: parseInt(operativos[0].total),
+            vehiculos_criticos: parseInt(criticos[0].total),
+            costos_acumulados: parseFloat(costos[0].total),
+            mantenimientos_realizados: 0,
+            mantenimientos_pendientes: 0,
+            componentes_desgaste: [],
+            alertas_recientes: []
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
