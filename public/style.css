@@ -1,9 +1,3 @@
-/* ============================================
-   SUSPENTRACK - ESTILOS GLOBALES
-   Sistema de Gestión de Mantenimiento de Suspensión
-   Cantón Mocha - Tungurahua
-   ============================================ */
-
 :root {
     /* Colores principales */
     --azul-principal: #1a3a8a;
@@ -33,9 +27,7 @@
     --sombra-fuerte: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* ============================================
-   ESTILOS BASE
-   ============================================ */
+/* ESTILOS BASE*/
 
 * {
     margin: 0;
@@ -51,9 +43,7 @@ body {
     min-height: 100vh;
 }
 
-/* ============================================
-   NAVBAR
-   ============================================ */
+/* NAVBAR*/
 
 .navbar {
     background: linear-gradient(135deg, var(--azul-principal) 0%, var(--azul-oscuro) 100%);
@@ -98,9 +88,7 @@ body {
     color: var(--negro) !important;
 }
 
-/* ============================================
-   SIDEBAR
-   ============================================ */
+/* SIDEBAR*/
 
 .sidebar {
     background: linear-gradient(180deg, var(--azul-principal) 0%, var(--azul-oscuro) 100%);
@@ -136,9 +124,7 @@ body {
     color: var(--negro);
 }
 
-/* ============================================
-   TARJETAS (CARDS)
-   ============================================ */
+/* TARJETAS (CARDS)*/
 
 .card {
     border: none;
@@ -170,9 +156,7 @@ body {
     color: var(--blanco);
 }
 
-/* ============================================
-   TARJETAS DE ESTADÍSTICAS (KPIs)
-   ============================================ */
+/* TARJETAS DE ESTADÍSTICAS (KPIs)*/
 
 .card-dashboard {
     border: none;
@@ -207,9 +191,7 @@ body {
     opacity: 0.8;
 }
 
-/* ============================================
-   BOTONES
-   ============================================ */
+/* BOTONES */
 
 .btn-primary {
     background: linear-gradient(135deg, var(--azul-principal), var(--azul-oscuro));
@@ -250,9 +232,7 @@ body {
     border-color: var(--azul-principal);
 }
 
-/* ============================================
-   TABLAS
-   ============================================ */
+/* TABLAS */
 
 .table {
     border-radius: 12px;
@@ -282,9 +262,7 @@ body {
     background-color: rgba(26, 58, 138, 0.08);
 }
 
-/* ============================================
-   FORMULARIOS
-   ============================================ */
+/*  FORMULARIOS*/
 
 .form-control, .form-select {
     border: 1px solid var(--gris-claro);
@@ -310,9 +288,7 @@ body {
     color: var(--rojo-critico);
 }
 
-/* ============================================
-   BADGES (INSIGNIAS)
-   ============================================ */
+/* BADGES (INSIGNIAS)*/
 
 .badge {
     padding: 6px 12px;
@@ -355,18 +331,26 @@ body {
 .badge-mantenimiento { background-color: #ffc107; color: #000; }
 .badge-inoperativo { background-color: #dc3545; color: white; }
 
-/* ============================================
-   ANIMACIONES
-   ============================================ */
+/* ANIMACIONES*/
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .fade-in {
@@ -377,11 +361,9 @@ body {
     animation: pulse 1.5s infinite;
 }
 
-/* ============================================
-   COMPONENTES ESPECÍFICOS
-   ============================================ */
+/* COMPONENTES ESPECÍFICOS DE SUSPENTRACK */
 
-/* Tarjetas de componentes */
+/* Tarjetas de componentes de suspension */
 .componente-card {
     border: 1px solid var(--gris-claro);
     border-radius: 12px;
@@ -403,7 +385,7 @@ body {
 .componente-estado-malo { border-left: 4px solid #fd7e14; }
 .componente-estado-critico { border-left: 4px solid #dc3545; }
 
-/* Ficha de vehículo */
+/* Ficha de vehiculo */
 .ficha-vehiculo {
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 12px;
@@ -427,9 +409,7 @@ body {
 .alerta-medio { border-left: 4px solid var(--amarillo-medio); }
 .alerta-bajo { border-left: 4px solid var(--verde-bajo); }
 
-/* ============================================
-   FOOTER
-   ============================================ */
+/* FOOTER */
 
 footer {
     background-color: var(--azul-oscuro);
@@ -449,9 +429,7 @@ footer a:hover {
     color: var(--dorado-brillante);
 }
 
-/* ============================================
-   UTILIDADES
-   ============================================ */
+/* UTILIDADES*/
 
 .text-gold {
     color: var(--dorado);
@@ -477,9 +455,7 @@ footer a:hover {
     box-shadow: var(--sombra-media);
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/* RESPONSIVE*/
 
 @media (max-width: 768px) {
     .sidebar {
@@ -520,9 +496,7 @@ footer a:hover {
     }
 }
 
-/* ============================================
-   SCROLLBAR PERSONALIZADA
-   ============================================ */
+/*SCROLLBAR PERSONALIZADA*/
 
 ::-webkit-scrollbar {
     width: 8px;
@@ -543,9 +517,7 @@ footer a:hover {
     background: var(--dorado);
 }
 
-/* ============================================
-   IMPRESIÓN
-   ============================================ */
+/* IMPRESIÓN */
 
 @media print {
     .navbar, .sidebar, footer, .btn, .no-print {
